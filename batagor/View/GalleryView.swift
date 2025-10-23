@@ -1,0 +1,94 @@
+//
+//  GalleryView.swift
+//  batagor
+//
+//  Created by Gede Pramananda Kusuma Wisesa on 21/10/25.
+//
+
+import SwiftUI
+import SwiftData
+
+struct GalleryView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
+    
+    @Query(sort: \Photo.expiredAt, order: .forward)
+        private var allPhotos: [Photo]
+
+        private var photos: [Photo] {
+            allPhotos.filter { $0.expiredAt > Date() }
+        }
+    
+    @State private var cleanupTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                if photos.isEmpty {
+                    emptyStateView
+                } else {
+                    galleryGridView
+                }
+            }
+            .navigationTitle("Gallery")
+        }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            if newPhase == .background {
+                Task { @MainActor in
+                    await
+                    PhotoDeletionService.shared.performCleanup(modelContext: modelContext)
+                }
+            }
+        }
+        .onReceive(cleanupTimer) { _ in
+            Task { @MainActor in
+                await
+                PhotoDeletionService.shared.performCleanup(modelContext: modelContext)
+            }
+        }
+        .onAppear {
+            if photos.isEmpty {
+                cleanupTimer.upstream.connect().cancel()
+            }
+        }
+        .onDisappear {
+            cleanupTimer.upstream.connect().cancel()
+        }
+    }
+    
+    private var galleryGridView: some View {
+        ScrollView {
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 12),
+                GridItem(.flexible(), spacing: 12)
+            ], spacing: 12) {
+                ForEach(photos) { photo in
+                    GalleryItemView(photo: photo)
+                }
+            }
+            .padding()
+        }
+    }
+
+    private var emptyStateView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "photo.on.rectangle.angled")
+                .font(.system(size: 80))
+                .foregroundStyle(.gray)
+            
+            Text("No Photos")
+                .font(.title2)
+                .fontWeight(.semibold)
+            
+            Text("Captured photos will appear here")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+        }.padding()
+    }
+}
+
+
+
+#Preview {
+    GalleryView()
+}
