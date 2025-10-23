@@ -25,7 +25,7 @@ struct batagorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            DefaultView()
+            Camera()
         }
         .modelContainer(sharedModelContainer)
     }
