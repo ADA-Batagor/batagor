@@ -7,17 +7,20 @@
 
 import AVFoundation
 import SwiftUI
+import SwiftData
 
 @MainActor
 class CameraViewModel: ObservableObject {
     let camera = CameraManager()
-    
+    let storageManager = PhotoStorageManager.shared
+            
     @Published var cameraMode: CameraMode = .photo
     @Published var previewImage: Image?
     @Published var photoTaken: PhotoData?
     @Published var movieFileURL: URL?
     
     init() {
+        
         Task {
             await handleCameraPreview()
         }
@@ -47,6 +50,7 @@ class CameraViewModel: ObservableObject {
             .compactMap { await self.unpackPhoto($0) }
         
         for await photoData in unpackedPhotoStream {
+            
             Task { @MainActor in
                 photoTaken = photoData
             }
@@ -61,6 +65,22 @@ class CameraViewModel: ObservableObject {
                 movieFileURL = url
             }
         }
+    }
+    
+    func handleSavePhoto(context: ModelContext) {
+        if let image = photoTaken {
+            let savePhoto = UIImage(data: image.imageData)!
+            if let filename = storageManager.savePhoto(savePhoto) {
+                let photo = Photo(createdAt: Date(), expiredAt: 60, filePath: filename)
+                context.insert(photo)
+                print("Added \(filename)")
+            }
+            
+            try? context.save()
+            print("Photo saved!")
+        }
+        
+        photoTaken = nil
     }
     
     private func unpackPhoto(_ photo: AVCapturePhoto) -> PhotoData? {

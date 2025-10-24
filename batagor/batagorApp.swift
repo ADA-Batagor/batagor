@@ -26,7 +26,7 @@ struct batagorApp: App {
     var body: some Scene {
         WindowGroup {
 //            DefaultView()
-            GalleryView()
+            Camera()
                 .onAppear {
                     PhotoSeeder.shared.seed(modelContext: sharedModelContainer.mainContext)
                     Task { @MainActor in
