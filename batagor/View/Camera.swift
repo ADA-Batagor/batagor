@@ -62,14 +62,18 @@ struct Camera: View {
                                     .fill(.white)
                                 
                                 Button {
-                                    Task {
-                                        vibrateLight()
-                                        cameraViewModel.camera.takePhoto()
+                                    vibrateLight()
+                                    cameraViewModel.camera.takePhoto()
+                                    
+                                    withAnimation(.easeInOut(duration: 0.05)) {
                                         capturingPhoto = true
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: {
-                                            capturingPhoto = false
-                                        })
                                     }
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                                        withAnimation(.easeInOut(duration: 0.05)) {
+                                            capturingPhoto = false
+                                        }
+                                    })
                                 } label: {
                                     Circle()
                                         .inset(by: lineWidth * 1.2)
