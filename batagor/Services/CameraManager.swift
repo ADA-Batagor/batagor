@@ -180,8 +180,8 @@ class CameraManager: NSObject {
         
         let filename = UUID().uuidString
         let filepath = directoryPath
+            .appendingPathComponent("Movies", isDirectory: true)
             .appendingPathComponent(filename)
-            .appendingPathExtension("mp4")
         
         movieFileOutput.startRecording(to: filepath, recordingDelegate: self)
     }

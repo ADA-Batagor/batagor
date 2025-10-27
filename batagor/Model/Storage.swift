@@ -9,9 +9,10 @@ import Foundation
 import SwiftData
 
 @Model
-class Photo {
+class Storage {
     var id: UUID
-    var filePath: String
+    var mainPath: URL
+    var thumbnailPath: URL
     var createdAt: Date
     var expiredAt: Date
     
@@ -24,18 +25,20 @@ class Photo {
     }
     
     // Default 24 hours
-    init(createdAt: Date = Date(), filePath: String) {
+    init(createdAt: Date = Date(), mainPath: URL, thumbnailPath: URL) {
         self.id = UUID()
         self.createdAt = createdAt
         self.expiredAt = createdAt.addingTimeInterval(24 * 60 * 60)
-        self.filePath = filePath
+        self.mainPath = mainPath
+        self.thumbnailPath = thumbnailPath
     }
     
     // Custom expiration time
-    init(createdAt: Date = Date(), expiredAt seconds: TimeInterval, filePath: String) {
+    init(createdAt: Date = Date(), expiredAt seconds: TimeInterval, mainPath: URL, thumbnailPath: URL) {
         self.id = UUID()
         self.createdAt = createdAt
         self.expiredAt = createdAt.addingTimeInterval(seconds)
-        self.filePath = filePath
+        self.mainPath = mainPath
+        self.thumbnailPath = thumbnailPath
     }
 }

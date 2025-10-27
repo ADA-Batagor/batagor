@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct GalleryItemView: View {
-    let photo: Photo
+    let storage: Storage
     @State private var timeRemaining: TimeInterval = 0
     @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
-            if let image = PhotoStorageManager.shared.loadPhoto(filename: photo.filePath) {
+            if let image = StorageManager.shared.loadThumbnail(fileURL: storage.thumbnailPath) {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -55,7 +55,7 @@ struct GalleryItemView: View {
     }
     
     private func updateTimeRemaining() {
-        timeRemaining = photo.timeRemaining
+        timeRemaining = storage.timeRemaining
     }
     
     private func formatTimeRemaining(_ interval: TimeInterval) -> String {
@@ -75,9 +75,10 @@ struct GalleryItemView: View {
 }
 
 #Preview {
-    GalleryItemView(photo: Photo(
+    GalleryItemView(storage: Storage(
         createdAt: Date(),
         expiredAt: 300,
-        filePath: "preview"
+        mainPath: URL(string: "https://images.unsplash.com/photo-1761405378282-e819a65cb493?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1364")!,
+        thumbnailPath: URL(string: "https://images.unsplash.com/photo-1761405378282-e819a65cb493?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1364")!
     ))
 }

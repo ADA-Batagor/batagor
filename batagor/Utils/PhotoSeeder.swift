@@ -14,7 +14,7 @@ class PhotoSeeder {
     
     @MainActor
     func seed(modelContext: ModelContext) {
-        let descriptor = FetchDescriptor<Photo>()
+        let descriptor = FetchDescriptor<Storage>()
         if let existingPhotos = try? modelContext.fetch(descriptor), !existingPhotos.isEmpty {
             print("Photo already exists. Skipping...")
             return
@@ -29,9 +29,9 @@ class PhotoSeeder {
         for (index, color) in colors.enumerated() {
             let dummyPhoto = createDummyPhoto(color: color, label: labels[index])
             
-            if let filename = PhotoStorageManager.shared.savePhoto(dummyPhoto) {
-                let photo = Photo(createdAt: Date(), expiredAt: expirationTimes[index], filePath: filename)
-                modelContext.insert(photo)
+            if let fileURL = StorageManager.shared.savePhoto(dummyPhoto) {
+                let file = Storage(createdAt: Date(), expiredAt: expirationTimes[index], mainPath: fileURL, thumbnailPath: fileURL)
+                modelContext.insert(file)
                 print("Added \(labels[index]) - expires in \(expirationTimes[index])s")
             }
         }

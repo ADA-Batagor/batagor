@@ -6,13 +6,17 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct Camera: View {
     @Environment(\.modelContext) private var modelContext
     
     @StateObject private var cameraViewModel = CameraViewModel()
     
+    
     @State private var capturingPhoto = false
+    @State private var isPressed = false
+    @State private var isRecording = false
     
     var lineWidth: CGFloat = 4.0
     
@@ -60,26 +64,53 @@ struct Camera: View {
                                 Circle()
                                     .stroke(lineWidth: lineWidth)
                                     .fill(.white)
-                                
-                                Button {
-                                    vibrateLight()
-                                    cameraViewModel.camera.takePhoto()
-                                    
-                                    withAnimation(.easeInOut(duration: 0.05)) {
-                                        capturingPhoto = true
-                                    }
-                                    
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
-                                        withAnimation(.easeInOut(duration: 0.05)) {
-                                            capturingPhoto = false
+                                Circle()
+                                    .inset(by: lineWidth * 1.2)
+                                    .fill(isRecording ? .red : .white)
+                                    .scaleEffect(isPressed ? 0.85 : 1.0)
+                                    .frame(height: isRecording ? 120 : 75)
+                                    .onTapGesture {
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            isPressed = true
                                         }
-                                    })
-                                } label: {
-                                    Circle()
-                                        .inset(by: lineWidth * 1.2)
-                                        .fill(.white)
-                                }
-                                .buttonStyle(PhotoButtonStyle())
+                                        
+                                        vibrateLight()
+                                        cameraViewModel.camera.takePhoto()
+                                        
+                                        withAnimation(.easeInOut(duration: 0.05)) {
+                                            capturingPhoto = true
+                                        }
+                                        
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+                                            withAnimation(.easeInOut(duration: 0.05)) {
+                                                capturingPhoto = false
+                                                isPressed = false
+                                            }
+                                        })
+                                    }
+                                    .onLongPressGesture {
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            isPressed = true
+                                            isRecording = true
+                                        }
+                                        
+                                        vibrateLight()
+                                        cameraViewModel.camera.startRecordingVideo()
+                                        
+                                        print("Recording started")
+                                    } onPressingChanged: { _ in
+                                        cameraViewModel.camera.stopRecordingVideo()
+                                        if isRecording {
+                                            vibrateLight()
+                                        }
+                                        
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            isPressed = false
+                                            isRecording = false
+                                        }
+                                    }
+                                
+                                
                             }
                             .frame(height: 75)
                             
@@ -104,6 +135,27 @@ struct Camera: View {
                                     cameraViewModel.handleSavePhoto(context: modelContext)
                                 }
                             }
+                            //                            .onChange(of: cameraViewModel.movieFileURL) { _, url in
+                            //                                if let url = url {
+                            //                                    let asset = AVAsset(url: url)
+                            //                                    let imageGenerator = AVAssetImageGenerator(asset: asset)
+                            //                                    imageGenerator.appliesPreferredTrackTransform = true // correct rotation
+                            //
+                            //
+                            //                                    // Capture at 1 second mark
+                            //                                    let time = CMTime(seconds: 1, preferredTimescale: 600)
+                            //                                    do {
+                            //                                        let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
+                            //                                        if let thumbnail = StorageManager.shared.savePhoto(UIImage(cgImage: cgImage)) {
+                            //                                            let photo = Storage(createdAt: Date(), expiredAt: 60, filePath: thumbnail)
+                            //                                            modelContext.insert(photo)
+                            //                                            try? modelContext.save()
+                            //                                        }
+                            //                                    } catch {
+                            //                                        print("gagal")
+                            //                                    }
+                            //                                }
+                            //                            }
                         }
                         .padding(.horizontal, 40)
                         .padding(.bottom, 30)

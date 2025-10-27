@@ -12,7 +12,7 @@ import SwiftData
 @MainActor
 class CameraViewModel: ObservableObject {
     let camera = CameraManager()
-    let storageManager = PhotoStorageManager.shared
+    let storageManager = StorageManager.shared
             
     @Published var cameraMode: CameraMode = .photo
     @Published var previewImage: Image?
@@ -69,11 +69,14 @@ class CameraViewModel: ObservableObject {
     
     func handleSavePhoto(context: ModelContext) {
         if let image = photoTaken {
-            let savePhoto = UIImage(data: image.imageData)!
-            if let filename = storageManager.savePhoto(savePhoto) {
-                let photo = Photo(createdAt: Date(), expiredAt: 60, filePath: filename)
-                context.insert(photo)
-                print("Added \(filename)")
+            let photo = UIImage(data: image.imageData)!
+            let mainPath = storageManager.savePhoto(photo)
+            let thumbnailPath = storageManager.saveThumbnail(photo)
+            
+            if let mainPath = mainPath, let thumbnailPath = thumbnailPath {
+                let storage = Storage(createdAt: Date(), expiredAt: 30, mainPath: mainPath, thumbnailPath: thumbnailPath)
+                context.insert(storage)
+                print("Added \(mainPath)")
             }
             
             try? context.save()

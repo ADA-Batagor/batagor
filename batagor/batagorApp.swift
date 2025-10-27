@@ -12,7 +12,7 @@ import SwiftData
 struct batagorApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Photo.self,
+            Storage.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -30,14 +30,14 @@ struct batagorApp: App {
                 .onAppear {
                     PhotoSeeder.shared.seed(modelContext: sharedModelContainer.mainContext)
                     Task { @MainActor in
-                        await PhotoDeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
+                        await DeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
                     }
                 }
         }
         .modelContainer(sharedModelContainer)
-        .backgroundTask(.appRefresh(PhotoDeletionService.backgroundTaskIdentifier)) { @MainActor in
-            await PhotoDeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
-            PhotoDeletionService.shared.scheduleBackgroundCleanup()
+        .backgroundTask(.appRefresh(DeletionService.backgroundTaskIdentifier)) { @MainActor in
+            await DeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
+            DeletionService.shared.scheduleBackgroundCleanup()
         }
     }
 }

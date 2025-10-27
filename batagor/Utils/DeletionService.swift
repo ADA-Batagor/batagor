@@ -9,30 +9,32 @@ import Foundation
 import SwiftData
 import BackgroundTasks
 
-class PhotoDeletionService {
-    static let shared = PhotoDeletionService()
+class DeletionService {
+    static let shared = DeletionService()
     static let backgroundTaskIdentifier = "com.tudemaha.batagor"
     
     @MainActor
     func performCleanup(modelContext: ModelContext) async {
-        let descriptor = FetchDescriptor<Photo>()
+        let descriptor = FetchDescriptor<Storage>()
         
-        guard let allPhotos = try? modelContext.fetch(descriptor) else {
+        guard let allFiles = try? modelContext.fetch(descriptor) else {
             return
         }
         
         let now = Date()
-        let expiredPhotos: [Photo] = allPhotos.filter {
+        let expiredFiles: [Storage] = allFiles.filter {
             $0.expiredAt < now
         }
         
-        guard !expiredPhotos.isEmpty else {
-            return 
+        guard !expiredFiles.isEmpty else {
+            return
         }
         
-        for photo in expiredPhotos {
-            PhotoStorageManager.shared.deletePhoto(filename: photo.filePath)
-            modelContext.delete(photo)
+        for file in expiredFiles {
+            StorageManager.shared.deleteFile(fileURL: file.mainPath)
+            StorageManager.shared.deleteFile(fileURL: file.thumbnailPath)
+            modelContext.delete(file)
+
         }
         
         try? modelContext.save()

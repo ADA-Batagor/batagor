@@ -12,10 +12,10 @@ struct GalleryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     
-    @Query(sort: \Photo.expiredAt, order: .forward)
-        private var allPhotos: [Photo]
+    @Query(sort: \Storage.expiredAt, order: .forward)
+        private var allPhotos: [Storage]
 
-        private var photos: [Photo] {
+        private var photos: [Storage] {
             allPhotos.filter { $0.expiredAt > Date() }
         }
     
@@ -36,14 +36,14 @@ struct GalleryView: View {
             if newPhase == .background {
                 Task { @MainActor in
                     await
-                    PhotoDeletionService.shared.performCleanup(modelContext: modelContext)
+                    DeletionService.shared.performCleanup(modelContext: modelContext)
                 }
             }
         }
         .onReceive(cleanupTimer) { _ in
             Task { @MainActor in
                 await
-                PhotoDeletionService.shared.performCleanup(modelContext: modelContext)
+                DeletionService.shared.performCleanup(modelContext: modelContext)
             }
         }
         .onAppear {
@@ -63,7 +63,7 @@ struct GalleryView: View {
                 GridItem(.flexible(), spacing: 12)
             ], spacing: 12) {
                 ForEach(photos) { photo in
-                    GalleryItemView(photo: photo)
+                    GalleryItemView(storage: photo)
                 }
             }
             .padding()
