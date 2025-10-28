@@ -16,15 +16,21 @@ struct Camera: View {
     
     @StateObject private var cameraViewModel = CameraViewModel()
     
+    @Query var storages: [Storage]
+    
     @State private var capturingPhoto = false
     @State private var isPressed = false
     @State private var isRecording = false
     
     var lineWidth: CGFloat = 4.0
-
+    
+    init() {
+        _storages = Query(FetchDescriptor<Storage>())
+    }
+    
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .center) {
                 Color(.black)
                 
                 ZStack(alignment: .bottom) {
@@ -65,10 +71,10 @@ struct Camera: View {
                             ZStack {
                                 Circle()
                                     .stroke(lineWidth: lineWidth)
-                                    .fill(.white)
+                                    .fill(storages.count >= 24 ? .gray : .white)
                                 Circle()
                                     .inset(by: lineWidth * 1.2)
-                                    .fill(isRecording ? .red : .white)
+                                    .fill(storages.count >= 24 ? .gray : isRecording ? .red : .white)
                                     .scaleEffect(isPressed ? 0.85 : 1.0)
                                     .frame(height: isRecording ? 120 : 75)
                                     .onTapGesture {
@@ -115,6 +121,7 @@ struct Camera: View {
                                 
                             }
                             .frame(height: 75)
+                            .disabled(storages.count >= 24 ? true : false)
                             
                             Spacer()
                             
@@ -132,27 +139,40 @@ struct Camera: View {
                             .padding(15)
                             .background(.black.opacity(0.5))
                             .clipShape(Circle())
-                            .onChange(of: cameraViewModel.photoTaken?.imageData) {
-                                cameraViewModel.handleSavePhoto(context: modelContext)
-                                cameraViewModel.handleFileCount(context: modelContext)
-                                print("count: \(cameraViewModel.dataCount)")
-                            }
-                            .onChange(of: cameraViewModel.movieFileURL) {
-                                cameraViewModel.handleSaveMovie(context: modelContext)
-                                cameraViewModel.handleFileCount(context: modelContext)
-                                print("count: \(cameraViewModel.dataCount)")
-                            }
                         }
                         .padding(.horizontal, 40)
                         .padding(.bottom, 30)
                     }
                 }
                 
+                if storages.count >= 24 {
+                    VStack {
+                        Image(systemName: "figure.fishing")
+                            .resizable()
+                            .scaledToFit()
+                            .containerRelativeFrame(.vertical) { height, _ in
+                                height * 0.1
+                            }
+                        Text("You take too much.")
+                            .font(.title.bold())
+                        Text("Go fishing, cuy!")
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .clipShape(.rect(cornerRadius: 20))
+                    .padding(.bottom, 50)
+                }
             }
             .ignoresSafeArea(.all)
         }
         .task {
             await cameraViewModel.camera.start()
+        }
+        .onChange(of: cameraViewModel.photoTaken?.imageData) {
+            cameraViewModel.handleSavePhoto(context: modelContext)
+        }
+        .onChange(of: cameraViewModel.movieFileURL) {
+            cameraViewModel.handleSaveMovie(context: modelContext)
         }
         .onChange(of: timer.currentTime) {
             Task { @MainActor in

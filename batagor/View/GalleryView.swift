@@ -21,8 +21,6 @@ struct GalleryView: View {
             allPhotos.filter { $0.expiredAt > Date() }
         }
     
-    @State private var cleanupTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
     var body: some View {
         NavigationStack {
             ZStack {

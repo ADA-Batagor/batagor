@@ -17,7 +17,7 @@ class CameraViewModel: ObservableObject {
     @Published var previewImage: Image?
     @Published var photoTaken: PhotoData?
     @Published var movieFileURL: URL?
-    @Published var dataCount: UInt8 = 0
+//    @Published var dataCount: UInt8 = 0
     
     init() {
         Task {
@@ -73,7 +73,7 @@ class CameraViewModel: ObservableObject {
             let thumbnailPath = storageManager.saveThumbnail(photo)
             
             if let mainPath = mainPath, let thumbnailPath = thumbnailPath {
-                let storage = Storage(createdAt: Date(), expiredAt: 30, mainPath: mainPath, thumbnailPath: thumbnailPath)
+                let storage = Storage(createdAt: Date(), expiredAt: 5 * 60, mainPath: mainPath, thumbnailPath: thumbnailPath)
                 context.insert(storage)
                 print("Added \(mainPath)")
             }
@@ -106,13 +106,13 @@ class CameraViewModel: ObservableObject {
         
         movieFileURL = nil
     }
-    
-    func handleFileCount(context: ModelContext) {
-        let descriptor = FetchDescriptor<Storage>()
-        if let count = try? context.fetchCount(descriptor) {
-            self.dataCount = UInt8(count)
-        }
-    }
+//    
+//    func handleFileCount(context: ModelContext) {
+//        let descriptor = FetchDescriptor<Storage>()
+//        if let count = try? context.fetchCount(descriptor) {
+//            self.dataCount = UInt8(count)
+//        }
+//    }
     
     private func unpackPhoto(_ photo: AVCapturePhoto) -> PhotoData? {
         guard let imageData = photo.fileDataRepresentation() else { return nil }
