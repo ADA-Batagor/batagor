@@ -130,32 +130,12 @@ struct Camera: View {
                             .padding(15)
                             .background(.black.opacity(0.5))
                             .clipShape(Circle())
-                            .onChange(of: cameraViewModel.photoTaken?.imageData) { _, photo in
-                                if let _ = photo {
-                                    cameraViewModel.handleSavePhoto(context: modelContext)
-                                }
+                            .onChange(of: cameraViewModel.photoTaken?.imageData) {
+                                cameraViewModel.handleSavePhoto(context: modelContext)
                             }
-                            //                            .onChange(of: cameraViewModel.movieFileURL) { _, url in
-                            //                                if let url = url {
-                            //                                    let asset = AVAsset(url: url)
-                            //                                    let imageGenerator = AVAssetImageGenerator(asset: asset)
-                            //                                    imageGenerator.appliesPreferredTrackTransform = true // correct rotation
-                            //
-                            //
-                            //                                    // Capture at 1 second mark
-                            //                                    let time = CMTime(seconds: 1, preferredTimescale: 600)
-                            //                                    do {
-                            //                                        let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
-                            //                                        if let thumbnail = StorageManager.shared.savePhoto(UIImage(cgImage: cgImage)) {
-                            //                                            let photo = Storage(createdAt: Date(), expiredAt: 60, filePath: thumbnail)
-                            //                                            modelContext.insert(photo)
-                            //                                            try? modelContext.save()
-                            //                                        }
-                            //                                    } catch {
-                            //                                        print("gagal")
-                            //                                    }
-                            //                                }
-                            //                            }
+                            .onChange(of: cameraViewModel.movieFileURL) {
+                                cameraViewModel.handleSaveMovie(context: modelContext)
+                            }
                         }
                         .padding(.horizontal, 40)
                         .padding(.bottom, 30)

@@ -45,6 +45,7 @@ class StorageManager {
         let filename = "\(UUID().uuidString)"
         let fileURL = thumbnailsDirectory.appendingPathComponent(filename)
         guard let data = image.jpegData(compressionQuality: 0.3) else {
+            print("jpg data error")
             return nil
         }
         
@@ -52,6 +53,7 @@ class StorageManager {
             try data.write(to: fileURL)
             return fileURL
         } catch {
+            print("write error")
             return nil
         }
     }

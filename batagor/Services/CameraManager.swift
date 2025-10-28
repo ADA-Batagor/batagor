@@ -182,6 +182,7 @@ class CameraManager: NSObject {
         let filepath = directoryPath
             .appendingPathComponent("Movies", isDirectory: true)
             .appendingPathComponent(filename)
+            .appendingPathExtension("mp4")
         
         movieFileOutput.startRecording(to: filepath, recordingDelegate: self)
     }

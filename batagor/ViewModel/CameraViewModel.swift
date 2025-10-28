@@ -13,8 +13,7 @@ import SwiftData
 class CameraViewModel: ObservableObject {
     let camera = CameraManager()
     let storageManager = StorageManager.shared
-            
-    @Published var cameraMode: CameraMode = .photo
+    
     @Published var previewImage: Image?
     @Published var photoTaken: PhotoData?
     @Published var movieFileURL: URL?
@@ -84,6 +83,28 @@ class CameraViewModel: ObservableObject {
         }
         
         photoTaken = nil
+    }
+    
+    func handleSaveMovie(context: ModelContext) {
+        if let movieURL = movieFileURL {
+            let asset = AVURLAsset(url: movieURL)
+            let imageGenerator = AVAssetImageGenerator(asset: asset)
+            imageGenerator.appliesPreferredTrackTransform = true
+            // create thumbnail for 1 second mark
+            let time = CMTime(seconds: 1, preferredTimescale: 600)
+            do {
+                let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
+                if let thumbnailURL = storageManager.saveThumbnail(UIImage(cgImage: cgImage)) {
+                    let storage = Storage(createdAt: Date(), expiredAt: 30, mainPath: movieURL, thumbnailPath: thumbnailURL)
+                    context.insert(storage)
+                    try? context.save()
+                }
+            } catch {
+                print("Error: \(error)")
+            }
+        }
+        
+        movieFileURL = nil
     }
     
     private func unpackPhoto(_ photo: AVCapturePhoto) -> PhotoData? {
