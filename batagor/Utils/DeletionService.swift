@@ -34,7 +34,7 @@ class DeletionService {
             StorageManager.shared.deleteFile(fileURL: file.mainPath)
             StorageManager.shared.deleteFile(fileURL: file.thumbnailPath)
             modelContext.delete(file)
-
+            print("deleted")
         }
         
         try? modelContext.save()
@@ -42,7 +42,7 @@ class DeletionService {
     
     func scheduleBackgroundCleanup() {
         let request = BGAppRefreshTaskRequest(identifier: Self.backgroundTaskIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 15 )
         
         try? BGTaskScheduler.shared.submit(request)
     }

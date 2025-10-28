@@ -7,19 +7,21 @@
 
 import SwiftUI
 import AVFoundation
+import SwiftData
 
 struct Camera: View {
     @Environment(\.modelContext) private var modelContext
     
-    @StateObject private var cameraViewModel = CameraViewModel()
+    @EnvironmentObject var timer: SharedTimerManager
     
+    @StateObject private var cameraViewModel = CameraViewModel()
     
     @State private var capturingPhoto = false
     @State private var isPressed = false
     @State private var isRecording = false
     
     var lineWidth: CGFloat = 4.0
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -132,9 +134,13 @@ struct Camera: View {
                             .clipShape(Circle())
                             .onChange(of: cameraViewModel.photoTaken?.imageData) {
                                 cameraViewModel.handleSavePhoto(context: modelContext)
+                                cameraViewModel.handleFileCount(context: modelContext)
+                                print("count: \(cameraViewModel.dataCount)")
                             }
                             .onChange(of: cameraViewModel.movieFileURL) {
                                 cameraViewModel.handleSaveMovie(context: modelContext)
+                                cameraViewModel.handleFileCount(context: modelContext)
+                                print("count: \(cameraViewModel.dataCount)")
                             }
                         }
                         .padding(.horizontal, 40)
@@ -148,7 +154,11 @@ struct Camera: View {
         .task {
             await cameraViewModel.camera.start()
         }
-        .environmentObject(cameraViewModel)
+        .onChange(of: timer.currentTime) {
+            Task { @MainActor in
+                await DeletionService.shared.performCleanup(modelContext: modelContext)
+            }
+        }
     }
     
     struct PhotoButtonStyle: ButtonStyle {

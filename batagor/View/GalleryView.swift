@@ -9,6 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct GalleryView: View {
+    @EnvironmentObject var timer: SharedTimerManager
+    
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     
@@ -40,19 +42,10 @@ struct GalleryView: View {
                 }
             }
         }
-        .onReceive(cleanupTimer) { _ in
+        .onChange(of: timer.currentTime) {
             Task { @MainActor in
-                await
-                DeletionService.shared.performCleanup(modelContext: modelContext)
+                await DeletionService.shared.performCleanup(modelContext: modelContext)
             }
-        }
-        .onAppear {
-            if photos.isEmpty {
-                cleanupTimer.upstream.connect().cancel()
-            }
-        }
-        .onDisappear {
-            cleanupTimer.upstream.connect().cancel()
         }
     }
     

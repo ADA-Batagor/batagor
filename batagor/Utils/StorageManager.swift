@@ -62,7 +62,7 @@ class StorageManager {
         guard let data = try? Data(contentsOf: fileURL) else {
             return nil
         }
-        print(fileURL)
+//        print(fileURL)
         return UIImage(data: data)
     }
     

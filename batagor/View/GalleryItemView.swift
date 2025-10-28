@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct GalleryItemView: View {
+    @EnvironmentObject var timer: SharedTimerManager
+    
     let storage: Storage
     @State private var timeRemaining: TimeInterval = 0
-    @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
@@ -49,7 +50,7 @@ struct GalleryItemView: View {
         .onAppear{
             updateTimeRemaining()
         }
-        .onReceive(timer) { _ in
+        .onChange(of: timer.currentTime) {
             updateTimeRemaining()
         }
     }
