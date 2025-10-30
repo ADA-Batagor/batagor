@@ -12,6 +12,7 @@ struct GalleryItemView: View {
     
     let storage: Storage
     @State private var timeRemaining: TimeInterval = 0
+    @State private var selectedStorage: Storage?
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
@@ -22,6 +23,9 @@ struct GalleryItemView: View {
                     .frame(height: 200)
                     .clipped()
                     .cornerRadius(12)
+                    .onTapGesture {
+                        selectedStorage = storage
+                    }
             } else {
                 Rectangle()
                     .fill(Color.gray.opacity(0.3))
@@ -52,6 +56,9 @@ struct GalleryItemView: View {
         }
         .onChange(of: timer.currentTime) {
             updateTimeRemaining()
+        }
+        .fullScreenCover(item: $selectedStorage) { _ in
+            DetailView(storage: $selectedStorage)
         }
     }
     

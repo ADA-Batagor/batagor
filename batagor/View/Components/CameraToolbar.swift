@@ -12,6 +12,7 @@ struct CameraToolbar: View {
     @ObservedObject var cameraViewModel: CameraViewModel
     
     var storageCount: Int
+    var latestStorage: Storage?
     @Binding var currentDuration: Double
     @Binding var isRecording: Bool
     @Binding var capturingPhoto: Bool
@@ -26,14 +27,22 @@ struct CameraToolbar: View {
             NavigationLink {
                 GalleryView()
             } label: {
-                Image(systemName: "photo.on.rectangle")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 30)
-                    .foregroundStyle(Color(.white))
+                if let storage = latestStorage, let uiImage = UIImage(contentsOfFile: storage.thumbnailPath.path()) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .clipShape(.circle)
+                        .frame(width: 30)
+                } else {
+                    Image(systemName: "photo.on.rectangle")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30)
+                        .foregroundStyle(Color(.white))
+                }
             }
             .padding(15)
-            .background(.black.opacity(0.5))
+            .background(latestStorage == nil ? .black.opacity(0.5) : .clear)
             .clipShape(Circle())
             
             Spacer()

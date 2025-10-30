@@ -48,10 +48,14 @@ struct Camera: View {
                         CameraToolbar(
                             cameraViewModel: cameraViewModel,
                             storageCount: storages.count,
+                            latestStorage: storages.last,
                             currentDuration: $currentDuration,
                             isRecording: $isRecording,
                             capturingPhoto: $capturingPhoto
                         )
+                        .containerRelativeFrame(.vertical) { height, _ in
+                            height * 0.15
+                        }
                         .padding(.horizontal, 40)
                         .padding(.bottom, 30)
                     }
