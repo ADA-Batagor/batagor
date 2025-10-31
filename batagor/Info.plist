@@ -6,6 +6,34 @@
 	<array>
 		<string>com.tudemaha.batagor</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>batagor-deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>batagor</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+	</array>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>camera.viewfinder</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Capture media</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>shortcutCamera</string>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array/>
 </dict>

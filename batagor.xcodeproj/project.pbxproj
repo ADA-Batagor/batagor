@@ -6,11 +6,63 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3F764C732EB09ED70028EDD1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FDD00D72EAF506300E14B66 /* WidgetKit.framework */; };
+		3F764C742EB09ED70028EDD1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FDD00D92EAF506300E14B66 /* SwiftUI.framework */; };
+		3F764C832EB09ED80028EDD1 /* widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3F764C722EB09ED70028EDD1 /* widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3F764C8F2EB0A96C0028EDD1 /* SwiftData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F764C8E2EB0A96C0028EDD1 /* SwiftData.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3F764C812EB09ED80028EDD1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9E61FA012EA75DD200053854 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F764C712EB09ED70028EDD1;
+			remoteInfo = widgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3FDD00EA2EAF506400E14B66 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3F764C832EB09ED80028EDD1 /* widgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		3F764C722EB09ED70028EDD1 /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F764C892EB0A8970028EDD1 /* widgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = widgetExtension.entitlements; sourceTree = "<group>"; };
+		3F764C8E2EB0A96C0028EDD1 /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
+		3FDD00D72EAF506300E14B66 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		3FDD00D92EAF506300E14B66 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		9E61FA092EA75DD200053854 /* batagor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = batagor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3F764C872EB09ED80028EDD1 /* Exceptions for "widget" folder in "widgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3F764C712EB09ED70028EDD1 /* widgetExtension */;
+		};
+		3F764C8B2EB0A8DF0028EDD1 /* Exceptions for "batagor" folder in "widgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Model/Storage.swift,
+				Utils/SharedModelContainer.swift,
+				Utils/StorageManager.swift,
+			);
+			target = 3F764C712EB09ED70028EDD1 /* widgetExtension */;
+		};
 		3F967A022EA78C17009E8E30 /* Exceptions for "batagor" folder in "batagor" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -21,10 +73,19 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		3F764C752EB09ED70028EDD1 /* widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3F764C872EB09ED80028EDD1 /* Exceptions for "widget" folder in "widgetExtension" target */,
+			);
+			path = widget;
+			sourceTree = "<group>";
+		};
 		9E61FA0B2EA75DD200053854 /* batagor */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				3F967A022EA78C17009E8E30 /* Exceptions for "batagor" folder in "batagor" target */,
+				3F764C8B2EB0A8DF0028EDD1 /* Exceptions for "batagor" folder in "widgetExtension" target */,
 			);
 			path = batagor;
 			sourceTree = "<group>";
@@ -32,6 +93,16 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3F764C6F2EB09ED70028EDD1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3F764C8F2EB0A96C0028EDD1 /* SwiftData.framework in Frameworks */,
+				3F764C742EB09ED70028EDD1 /* SwiftUI.framework in Frameworks */,
+				3F764C732EB09ED70028EDD1 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9E61FA062EA75DD200053854 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,10 +113,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3FDD00D62EAF506300E14B66 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3F764C8E2EB0A96C0028EDD1 /* SwiftData.framework */,
+				3FDD00D72EAF506300E14B66 /* WidgetKit.framework */,
+				3FDD00D92EAF506300E14B66 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		9E61FA002EA75DD200053854 = {
 			isa = PBXGroup;
 			children = (
+				3F764C892EB0A8970028EDD1 /* widgetExtension.entitlements */,
 				9E61FA0B2EA75DD200053854 /* batagor */,
+				3F764C752EB09ED70028EDD1 /* widget */,
+				3FDD00D62EAF506300E14B66 /* Frameworks */,
 				9E61FA0A2EA75DD200053854 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				9E61FA092EA75DD200053854 /* batagor.app */,
+				3F764C722EB09ED70028EDD1 /* widgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,6 +146,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3F764C712EB09ED70028EDD1 /* widgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F764C842EB09ED80028EDD1 /* Build configuration list for PBXNativeTarget "widgetExtension" */;
+			buildPhases = (
+				3F764C6E2EB09ED70028EDD1 /* Sources */,
+				3F764C6F2EB09ED70028EDD1 /* Frameworks */,
+				3F764C702EB09ED70028EDD1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3F764C752EB09ED70028EDD1 /* widget */,
+			);
+			name = widgetExtension;
+			packageProductDependencies = (
+			);
+			productName = widgetExtension;
+			productReference = 3F764C722EB09ED70028EDD1 /* widgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		9E61FA082EA75DD200053854 /* batagor */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9E61FA192EA75DD400053854 /* Build configuration list for PBXNativeTarget "batagor" */;
@@ -68,10 +175,12 @@
 				9E61FA052EA75DD200053854 /* Sources */,
 				9E61FA062EA75DD200053854 /* Frameworks */,
 				9E61FA072EA75DD200053854 /* Resources */,
+				3FDD00EA2EAF506400E14B66 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3F764C822EB09ED80028EDD1 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				9E61FA0B2EA75DD200053854 /* batagor */,
@@ -93,6 +202,9 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					3F764C712EB09ED70028EDD1 = {
+						CreatedOnToolsVersion = 16.2;
+					};
 					9E61FA082EA75DD200053854 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -113,11 +225,19 @@
 			projectRoot = "";
 			targets = (
 				9E61FA082EA75DD200053854 /* batagor */,
+				3F764C712EB09ED70028EDD1 /* widgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3F764C702EB09ED70028EDD1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9E61FA072EA75DD200053854 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -128,6 +248,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3F764C6E2EB09ED70028EDD1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9E61FA052EA75DD200053854 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -137,7 +264,71 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		3F764C822EB09ED80028EDD1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3F764C712EB09ED70028EDD1 /* widgetExtension */;
+			targetProxy = 3F764C812EB09ED80028EDD1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		3F764C852EB09ED80028EDD1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = widgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3QGY9BFW95;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = widget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3F764C862EB09ED80028EDD1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = widgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3QGY9BFW95;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = widget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		9E61FA172EA75DD400053854 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -262,10 +453,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = batagor/batagor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"batagor/Preview Content\"";
-				DEVELOPMENT_TEAM = HRYT2ZQSJ5;
+				DEVELOPMENT_TEAM = 3QGY9BFW95;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = batagor/Info.plist;
@@ -294,10 +486,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = batagor/batagor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"batagor/Preview Content\"";
-				DEVELOPMENT_TEAM = HRYT2ZQSJ5;
+				DEVELOPMENT_TEAM = 3QGY9BFW95;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = batagor/Info.plist;
@@ -324,6 +517,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3F764C842EB09ED80028EDD1 /* Build configuration list for PBXNativeTarget "widgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F764C852EB09ED80028EDD1 /* Debug */,
+				3F764C862EB09ED80028EDD1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9E61FA042EA75DD200053854 /* Build configuration list for PBXProject "batagor" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

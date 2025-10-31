@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 import BackgroundTasks
+import WidgetKit
 
 class DeletionService {
     static let shared = DeletionService()
@@ -38,6 +39,8 @@ class DeletionService {
         }
         
         try? modelContext.save()
+        
+        WidgetCenter.shared.reloadAllTimelines()
     }
     
     func scheduleBackgroundCleanup() {

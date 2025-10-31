@@ -10,36 +10,62 @@ import SwiftData
 
 @main
 struct batagorApp: App {
-    @StateObject private var sharedTaskManager = SharedTimerManager.shared
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Storage.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    @StateObject private var sharedTaskManager = SharedTimerManager.shared
+    @StateObject private var navigationManager = NavigationManager.shared
+    @StateObject private var shortcutManager = ShortcutManager.shared
+    
+    private var sharedModelContainer = SharedModelContainer.shared
     
     var body: some Scene {
         WindowGroup {
-            Camera()
-                .onAppear {
-                    PhotoSeeder.shared.seed(modelContext: sharedModelContainer.mainContext)
-                    Task { @MainActor in
-                        await DeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
+            NavigationStack {
+                Group {
+                    switch navigationManager.selectedTab {
+                    case .camera:
+                        Camera()
+                    case .gallery:
+                        GalleryView()
                     }
                 }
+                .onAppear {
+                    Task { @MainActor in
+                        await DeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
+                        shortcutManager.processShortcutItem(navigationManager: navigationManager)
+                    }
+               
+                }
+                .onChange(of: shortcutManager.shortcutItem, { oldValue, newValue in
+                    if newValue != nil {
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 500_000_000)
+                            shortcutManager.processShortcutItem(navigationManager: navigationManager)
+                        }
+                    }
+                })
                 .environmentObject(sharedTaskManager)
+                .environmentObject(navigationManager)
+            }
+            .onOpenURL { url in
+                handleDeepLink(url)
+            }
         }
         .modelContainer(sharedModelContainer)
         .backgroundTask(.appRefresh(DeletionService.backgroundTaskIdentifier)) { @MainActor in
             await DeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
             DeletionService.shared.scheduleBackgroundCleanup()
+        }
+        .handlesExternalEvents(matching: [])
+    }
+    
+    private func handleDeepLink(_ url: URL) {
+        guard url.scheme == "batagor" else { return }
+        
+        if url.host == "gallery" {
+            navigationManager.navigate(to: .gallery)
+        } else if url.host == "camera" {
+            navigationManager.navigate(to: .camera)
         }
     }
 }

@@ -173,7 +173,7 @@ class CameraManager: NSObject {
             return
         }
         
-        guard let directoryPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        guard let directoryPath = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedModelContainer.appGroupIdentifier) else {
             print("cannot access local file domain")
             return
         }

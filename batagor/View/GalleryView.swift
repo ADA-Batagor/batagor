@@ -10,11 +10,12 @@ import SwiftData
 
 struct GalleryView: View {
     @EnvironmentObject var timer: SharedTimerManager
+    @EnvironmentObject var navigationManager: NavigationManager
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     
-    @Query(sort: \Storage.expiredAt, order: .forward)
+    @Query(sort: \Storage.createdAt, order: .reverse)
         private var allPhotos: [Storage]
 
         private var photos: [Storage] {
@@ -28,6 +29,25 @@ struct GalleryView: View {
                     emptyStateView
                 } else {
                     galleryGridView
+                }
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button {
+                            navigationManager.navigate(to: .camera)
+                        } label: {
+                            Image(systemName: "camera.fill")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                                .frame(width: 60, height: 60)
+                                .background(Color.brown)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                        }
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
                 }
             }
             .navigationTitle("Gallery")
@@ -82,4 +102,5 @@ struct GalleryView: View {
 
 #Preview {
     GalleryView()
+        .environmentObject(SharedTimerManager.shared)
 }
