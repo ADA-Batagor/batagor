@@ -120,7 +120,7 @@ class CameraManager: NSObject {
         super.init()
         
         captureSession.sessionPreset = .low
-        sessionQueue = DispatchQueue.init(label: "com.tudemaha.batagor")
+        sessionQueue = DispatchQueue.init(label: Bundle.main.object(forInfoDictionaryKey: "MainAppBundleIdentifier") as! String)
         selectedCaptureDevice = availableCaptureDevices.first ?? AVCaptureDevice.default(for: .video)
     }
     
@@ -254,7 +254,7 @@ class CameraManager: NSObject {
         captureSession.sessionPreset = AVCaptureSession.Preset.high
         
         let videoOutput = AVCaptureVideoDataOutput()
-        videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "com.tudemaha.batagor.output"))
+        videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: Bundle.main.object(forInfoDictionaryKey: "MainAppBundleIdentifier") as! String + ".output"))
         
         guard captureSession.canAddInput(deviceInput) else {
             print("can't add device input to capture session")

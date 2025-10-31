@@ -12,7 +12,7 @@ import WidgetKit
 
 class DeletionService {
     static let shared = DeletionService()
-    static let backgroundTaskIdentifier = "com.tudemaha.batagor"
+    static let backgroundTaskIdentifier = Bundle.main.object(forInfoDictionaryKey: "MainAppBundleIdentifier") as! String
     
     @MainActor
     func performCleanup(modelContext: ModelContext) async {

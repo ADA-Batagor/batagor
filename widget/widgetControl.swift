@@ -10,7 +10,7 @@ import SwiftUI
 import WidgetKit
 
 struct widgetControl: ControlWidget {
-    static let kind: String = "com.tudemaha.batagor.widget"
+    static let kind: String = Bundle.main.object(forInfoDictionaryKey: "MainAppBundleIdentifier") as! String + ".widget"
 
     var body: some ControlWidgetConfiguration {
         AppIntentControlConfiguration(
