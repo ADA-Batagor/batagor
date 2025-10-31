@@ -10,9 +10,11 @@ import SwiftData
 
 @main
 struct batagorApp: App {
+    @StateObject private var sharedTaskManager = SharedTimerManager.shared
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Storage.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -22,11 +24,22 @@ struct batagorApp: App {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
-
+    
     var body: some Scene {
         WindowGroup {
-            DefaultView()
+            Camera()
+                .onAppear {
+                    PhotoSeeder.shared.seed(modelContext: sharedModelContainer.mainContext)
+                    Task { @MainActor in
+                        await DeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
+                    }
+                }
+                .environmentObject(sharedTaskManager)
         }
         .modelContainer(sharedModelContainer)
+        .backgroundTask(.appRefresh(DeletionService.backgroundTaskIdentifier)) { @MainActor in
+            await DeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
+            DeletionService.shared.scheduleBackgroundCleanup()
+        }
     }
 }
