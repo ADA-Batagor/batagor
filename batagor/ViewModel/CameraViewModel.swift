@@ -8,6 +8,7 @@
 import AVFoundation
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 @MainActor
 class CameraViewModel: ObservableObject {
@@ -79,6 +80,8 @@ class CameraViewModel: ObservableObject {
             
             try? context.save()
             print("Photo saved!")
+            
+            WidgetCenter.shared.reloadAllTimelines()
         }
         
         photoTaken = nil
@@ -101,6 +104,8 @@ class CameraViewModel: ObservableObject {
             } catch {
                 print("Error: \(error)")
             }
+            
+            WidgetCenter.shared.reloadAllTimelines()
         }
         
         movieFileURL = nil

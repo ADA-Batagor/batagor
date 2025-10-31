@@ -11,6 +11,8 @@ import SwiftData
 struct CameraToolbar: View {
     @ObservedObject var cameraViewModel: CameraViewModel
     
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     var storageCount: Int
     var latestStorage: Storage?
     @Binding var currentDuration: Double
@@ -24,8 +26,8 @@ struct CameraToolbar: View {
     
     var body: some View {
         HStack {
-            NavigationLink {
-                GalleryView()
+            Button {
+                navigationManager.navigate(to: .gallery)
             } label: {
                 if let storage = latestStorage, let uiImage = UIImage(contentsOfFile: storage.thumbnailPath.path()) {
                     Image(uiImage: uiImage)

@@ -15,11 +15,13 @@ class StorageManager {
     private let thumbnailsDirectory: URL
     
     private init() {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        guard let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedModelContainer.appGroupIdentifier) else {
+            fatalError("Shared container not found")
+        }
         
-        photosDirectory = paths[0].appendingPathComponent("Photos", isDirectory: true)
-        moviesDirectory = paths[0].appendingPathComponent("Movies", isDirectory: true)
-        thumbnailsDirectory = paths[0].appendingPathComponent("Thumbnails", isDirectory: true)
+        photosDirectory = sharedContainer.appendingPathComponent("Photos", isDirectory: true)
+        moviesDirectory = sharedContainer.appendingPathComponent("Movies", isDirectory: true)
+        thumbnailsDirectory = sharedContainer.appendingPathComponent("Thumbnails", isDirectory: true)
         
         try? FileManager.default.createDirectory(at: photosDirectory, withIntermediateDirectories: true)
         try? FileManager.default.createDirectory(at: moviesDirectory, withIntermediateDirectories: true)
