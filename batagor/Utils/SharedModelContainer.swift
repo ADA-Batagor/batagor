@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 class SharedModelContainer {
-    static let appGroupIdentifier = "group.com.tudemaha.batagor"
+    static let appGroupIdentifier = Bundle.main.object(forInfoDictionaryKey: "GroupAppBundleIdentifier") as! String
     
     static let shared: ModelContainer = {
         let schema = Schema([
