@@ -4,7 +4,7 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.tudemaha.batagor</string>
+		<string>$(MainAppBundleIdentifier)</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
@@ -38,5 +38,7 @@
 	<array/>
 	<key>MainAppBundleIdentifier</key>
 	<string>com.tudemaha.batagor</string>
+	<key>GroupAppBundleIdentifier</key>
+	<string>group.com.tudemaha.batagor</string>
 </dict>
 </plist>

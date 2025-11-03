@@ -4,6 +4,8 @@
 <dict>
 	<key>MainAppBundleIdentifier</key>
 	<string>com.tudemaha.batagor</string>
+	<key>GroupAppBundleIdentifier</key>
+	<string>group.com.tudemaha.batagor</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
