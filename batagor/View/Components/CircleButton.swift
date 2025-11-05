@@ -13,7 +13,7 @@ struct CircleButton: View {
     var body: some View {
         Image(systemName: icon)
             .bold()
-            .padding(12)
+            .padding(15)
             .background(.thickMaterial)
             .clipShape(.circle)
     }

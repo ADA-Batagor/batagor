@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DetailView: View {
     @Environment(\.modelContext) private var modelContext
-
+    
     @Binding var storage: Storage?
     
     @State private var showToolbar: Bool = true
@@ -49,14 +49,21 @@ struct DetailView: View {
                     
                     if showToolbar {
                         HStack {
-                            if let storage = storage {
-                                let mainData = try? Data(contentsOf: storage.mainPath)
-                                let thumbnailData = try? Data(contentsOf: storage.thumbnailPath)
-                                
+                            if let storage = storage,
+                               let mainData = try? Data(contentsOf: storage.mainPath),
+                               let thumbnailData = try? Data(contentsOf: storage.thumbnailPath),
+                               let thumbnailUIImage = UIImage(data: thumbnailData) {
                                 if storage.mainPath.pathExtension == "mp4" {
                                     
                                 } else {
-                                    
+                                    if let mainUIImage = UIImage(data: mainData) {
+                                        ShareLink(
+                                            item: Image(uiImage: mainUIImage),
+                                            preview: SharePreview("Share Your Temp Photo", image: Image(uiImage: thumbnailUIImage))
+                                        ) {
+                                            CircleButton(icon: "square.and.arrow.up")
+                                        }
+                                    }
                                 }
                             }
                             
@@ -84,9 +91,9 @@ struct DetailView: View {
                         }
                     }
                 }
-                .padding(.vertical, 50)
+                .padding(.vertical, 30)
                 .padding(.top, 20)
-                .padding(.horizontal, 30)
+                .padding(.horizontal, 25)
             }
             
         }
