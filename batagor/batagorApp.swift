@@ -66,15 +66,9 @@ struct batagorApp: App {
             navigationManager.navigate(to: .gallery)
         } else if url.host == "camera" {
             navigationManager.navigate(to: .camera)
-        } else if url.host == "media" {
-            let pathComponents = url.pathComponents.filter { $0 != "/" }
-            if let uuidString = pathComponents.first,
-               let uuid = UUID(uuidString: uuidString) {
-                navigationManager.navigateToMediaDetail(mediaId: uuid)
-            }
         }
     }
-    
+
     private func sign() {
         let batagor = """
         
@@ -85,4 +79,20 @@ struct batagorApp: App {
         """
         print(batagor)
     }
+    
+    private func checkWidgetIntent() {
+        guard let groupIdentifier = Bundle.main.object(forInfoDictionaryKey: "GroupAppBundleIdentifier") as? String else {
+            return
+        }
+        
+        guard let sharedDefaults = UserDefaults(suiteName: groupIdentifier) else {
+            return
+        }
+        
+        if sharedDefaults.bool(forKey: "isOpenCamera") {
+            sharedDefaults.set(false, forKey: "isOpenCamera")
+            navigationManager.navigate(to: .camera)
+        }
+    }
+        
 }
