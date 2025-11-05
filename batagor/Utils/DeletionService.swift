@@ -43,6 +43,16 @@ class DeletionService {
         WidgetCenter.shared.reloadAllTimelines()
     }
     
+    func manualDelete(modelContext: ModelContext, storage: Storage) {
+        StorageManager.shared.deleteFile(fileURL: storage.mainPath)
+        StorageManager.shared.deleteFile(fileURL: storage.thumbnailPath)
+        modelContext.delete(storage)
+        
+        try? modelContext.save()
+        
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+    
     func scheduleBackgroundCleanup() {
         let request = BGAppRefreshTaskRequest(identifier: Self.backgroundTaskIdentifier)
         request.earliestBeginDate = Date(timeIntervalSinceNow: 15 )

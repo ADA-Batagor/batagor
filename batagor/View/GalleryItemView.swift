@@ -8,10 +8,7 @@
 import SwiftUI
 
 struct GalleryItemView: View {
-    @EnvironmentObject var timer: SharedTimerManager
-    
     let storage: Storage
-    @State private var timeRemaining: TimeInterval = 0
     @State private var selectedStorage: Storage?
     
     var body: some View {
@@ -37,49 +34,13 @@ struct GalleryItemView: View {
                             .foregroundStyle(.gray)
                     )
             }
-            HStack(spacing: 4) {
-                Image(systemName: "clock.fill")
-                    .font(.caption2)
-                Text(formatTimeRemaining(timeRemaining))
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .monospacedDigit()
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(.ultraThinMaterial)
-            .cornerRadius(8)
-            .padding(8)
-        }
-        .onAppear{
-            updateTimeRemaining()
-        }
-        .onChange(of: timer.currentTime) {
-            updateTimeRemaining()
+            
+            RemainingTime(storage: storage, variant: .small)
         }
         .fullScreenCover(item: $selectedStorage) { _ in
             DetailView(storage: $selectedStorage)
         }
     }
-    
-    private func updateTimeRemaining() {
-        timeRemaining = storage.timeRemaining
-    }
-    
-    private func formatTimeRemaining(_ interval: TimeInterval) -> String {
-        let hours = Int(interval) / 3600
-        let minutes = (Int(interval) % 3600) / 60
-        let seconds = Int(interval) % 60
-        
-        if hours > 0 {
-            return String(format: "%dh %dm", hours, minutes)
-        } else if minutes > 0 {
-            return String(format: "%dm %ds", minutes, seconds)
-        } else {
-            return String(format: "%ds", seconds)
-        }
-    }
-    
 }
 
 #Preview {

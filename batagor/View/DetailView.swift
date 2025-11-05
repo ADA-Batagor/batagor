@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct DetailView: View {
+    @Environment(\.modelContext) private var modelContext
+
     @Binding var storage: Storage?
     
     @State private var showToolbar: Bool = true
+    @State private var showDeleteConfirmation: Bool = false
     
     var body: some View {
         ZStack {
@@ -24,28 +27,61 @@ struct DetailView: View {
                 }
                 
                 VStack {
-                    HStack {
-                        Button {
-                            storage = nil
-                        } label: {
-                            Text("Back")
-                        }
-                        
-                        Spacer()
-                    }
-
-                    Spacer()
-                        
-                    HStack {
-                        Button {
+                    if showToolbar {
+                        HStack {
+                            Button {
+                                storage = nil
+                            } label: {
+                                CircleButton(icon: "chevron.backward")
+                            }
                             
-                        } label: {
-                            Text("Share")
+                            Spacer()
+                            
+                            if let storage = storage {
+                                RemainingTime(storage: storage, variant: .large)
+                            }
+                            
+                            Spacer()
                         }
-                        
-                        Spacer()
-                        
-                        Text("Expired")
+                    }
+                    
+                    Spacer()
+                    
+                    if showToolbar {
+                        HStack {
+                            if let storage = storage {
+                                let mainData = try? Data(contentsOf: storage.mainPath)
+                                let thumbnailData = try? Data(contentsOf: storage.thumbnailPath)
+                                
+                                if storage.mainPath.pathExtension == "mp4" {
+                                    
+                                } else {
+                                    
+                                }
+                            }
+                            
+                            Spacer()
+                            
+                            Button {
+                                showDeleteConfirmation = true
+                            } label: {
+                                CircleButton(icon: "trash")
+                            }
+                            .confirmationDialog("Delete Photo", isPresented: $showDeleteConfirmation, titleVisibility: .hidden) {
+                                Button("Delete", role: .destructive) {
+                                    if let storage = storage {
+                                        withAnimation {
+                                            DeletionService.shared.manualDelete(modelContext: modelContext, storage: storage)
+                                        }
+                                    }
+                                }
+                            } message: {
+                                if let storage = storage,
+                                   let ext = storage.mainPath.pathExtension == "mp4" ? "video" : "photo" {
+                                    Text("This \(ext) will be deleted permanently.")
+                                }
+                            }
+                        }
                     }
                 }
                 .padding(.vertical, 50)
@@ -63,6 +99,11 @@ struct DetailView: View {
     }
 }
 
-//#Preview {
-//    DetailView()
-//}
+#Preview {
+    DetailView(storage: .constant(
+        Storage(
+            mainPath: URL(string: "https://example.com")!,
+            thumbnailPath: URL(string: "https://example.com")!
+        )
+    ))
+}
