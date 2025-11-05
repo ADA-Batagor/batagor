@@ -38,7 +38,7 @@ struct GalleryItemView: View {
             RemainingTime(storage: storage, variant: .small)
         }
         .fullScreenCover(item: $selectedStorage) { _ in
-            DetailView(storage: $selectedStorage)
+            DetailView(selectedStorage: $selectedStorage)
         }
     }
 }

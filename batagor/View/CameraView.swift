@@ -34,6 +34,11 @@ struct Camera: View {
                 Color(.black)
                 
                 ZStack(alignment: .bottom) {
+                    Color(.black)
+                        .containerRelativeFrame(.vertical) { height, _ in
+                            height * 0.91
+                        }
+                    
                     if let image = cameraViewModel.previewImage {
                         image
                             .resizable()
