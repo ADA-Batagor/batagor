@@ -23,6 +23,10 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>GroupAppBundleIdentifier</key>
+	<string>group.com.fuad.batagor</string>
+	<key>MainAppBundleIdentifier</key>
+	<string>com.fuad.batagor</string>
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>
@@ -36,9 +40,5 @@
 	</array>
 	<key>UIBackgroundModes</key>
 	<array/>
-	<key>MainAppBundleIdentifier</key>
-	<string>com.tudemaha.batagor</string>
-	<key>GroupAppBundleIdentifier</key>
-	<string>group.com.tudemaha.batagor</string>
 </dict>
 </plist>
