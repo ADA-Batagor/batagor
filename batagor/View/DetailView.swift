@@ -40,7 +40,7 @@ struct DetailView: View {
                         Button {
                             
                         } label: {
-                            Text("Share")
+                            Text("Sharee")
                         }
                         
                         Spacer()
