@@ -56,7 +56,7 @@ struct Provider: TimelineProvider {
         
         let validMedia = allStorages.filter{!$0.isExpired}.prefix(limit)
         return validMedia.compactMap { storage in
-            guard StorageManager.shared.loadThumbnail(fileURL: storage.thumbnailPath) != nil else {
+            guard StorageManager.shared.loadUIImage(fileURL: storage.thumbnailPath) != nil else {
                 print("fetchRecentMedia: thumbnail not found \(storage.thumbnailPath)")
                 return nil
             }
@@ -68,7 +68,7 @@ struct Provider: TimelineProvider {
 
 // MARK: - Helper Functions
   func loadThumbnailForWidget(fileURL: URL, maxDimension: CGFloat = 400) -> UIImage? {
-      guard let fullImage = StorageManager.shared.loadThumbnail(fileURL: fileURL) else {
+      guard let fullImage = StorageManager.shared.loadUIImage(fileURL: fileURL) else {
           return nil
       }
 

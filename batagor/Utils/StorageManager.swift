@@ -60,7 +60,7 @@ class StorageManager {
         }
     }
     
-    func loadThumbnail(fileURL: URL) -> UIImage? {
+    func loadUIImage(fileURL: URL) -> UIImage? {
         guard let data = try? Data(contentsOf: fileURL) else {
             return nil
         }

@@ -10,10 +10,11 @@ import SwiftUI
 struct GalleryItemView: View {
     let storage: Storage
     @State private var selectedStorage: Storage?
+    @State private var showCover: Bool = false
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
-            if let image = StorageManager.shared.loadThumbnail(fileURL: storage.thumbnailPath) {
+            if let image = StorageManager.shared.loadUIImage(fileURL: storage.thumbnailPath) {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -22,6 +23,7 @@ struct GalleryItemView: View {
                     .cornerRadius(12)
                     .onTapGesture {
                         selectedStorage = storage
+                        showCover = true
                     }
             } else {
                 Rectangle()
@@ -37,8 +39,8 @@ struct GalleryItemView: View {
             
             RemainingTime(storage: storage, variant: .small)
         }
-        .fullScreenCover(item: $selectedStorage) { _ in
-            DetailView(selectedStorage: $selectedStorage)
+        .fullScreenCover(isPresented: $showCover) {
+            DetailView(selectedStorage: $selectedStorage, showCover: $showCover)
         }
     }
 }
