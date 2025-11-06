@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1"
+     creator="Manual GPX Creator"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  
+  <metadata>
+    <n>Marina Bay Sands Test Location</n>
+    <desc>GPS coordinates for testing reverse geocoding at Marina Bay Sands, Singapore</desc>
+    <author>
+      <n>User</n>
+    </author>
+    <time>2025-11-06T12:00:00Z</time>
+  </metadata>
+  
+  <!-- Marina Bay Sands Main Building -->
+  <wpt lat="1.283690" lon="103.860540">
+    <ele>191</ele>
+    <time>2025-11-06T12:00:00Z</time>
+    <n>Marina Bay Sands</n>
+    <desc>Marina Bay Sands - Iconic hotel and integrated resort</desc>
+    <sym>Flag, Blue</sym>
+    <type>Hotel/Resort</type>
+    <cmt>Should return "Marina Bay Sands" from reverse geocoding</cmt>
+  </wpt>
+  
+  <!-- SkyPark Observation Deck -->
+  <wpt lat="1.284140" lon="103.860350">
+    <ele>200</ele>
+    <time>2025-11-06T12:05:00Z</time>
+    <n>Marina Bay Sands SkyPark</n>
+    <desc>SkyPark Observation Deck on top of Marina Bay Sands</desc>
+    <sym>Summit</sym>
+    <type>Observation Deck</type>
+    <cmt>Rooftop observation deck</cmt>
+  </wpt>
+  
+  <!-- The Shoppes at Marina Bay Sands -->
+  <wpt lat="1.283380" lon="103.859820">
+    <ele>5</ele>
+    <time>2025-11-06T12:10:00Z</time>
+    <n>The Shoppes at Marina Bay Sands</n>
+    <desc>Luxury shopping mall at Marina Bay Sands</desc>
+    <sym>Shopping Cart</sym>
+    <type>Shopping Mall</type>
+    <cmt>Should return "The Shoppes at Marina Bay Sands"</cmt>
+  </wpt>
+  
+  <!-- Gardens by the Bay (nearby) -->
+  <wpt lat="1.281570" lon="103.863630">
+    <ele>8</ele>
+    <time>2025-11-06T12:15:00Z</time>
+    <n>Gardens by the Bay</n>
+    <desc>Gardens by the Bay - Iconic Supertree Grove</desc>
+    <sym>Garden</sym>
+    <type>Park</type>
+    <cmt>Should return "Gardens by the Bay"</cmt>
+  </wpt>
+  
+  <!-- Merlion Park -->
+  <wpt lat="1.286890" lon="103.854580">
+    <ele>3</ele>
+    <time>2025-11-06T12:20:00Z</time>
+    <n>Merlion Park</n>
+    <desc>Merlion Park - Singapore's iconic Merlion statue</desc>
+    <sym>Flag, Red</sym>
+    <type>Landmark</type>
+    <cmt>Should return "Merlion Park"</cmt>
+  </wpt>
+  
+  <!-- Track around Marina Bay -->
+  <trk>
+    <n>Marina Bay Walk</n>
+    <desc>Walking route around Marina Bay area</desc>
+    <trkseg>
+      <trkpt lat="1.286890" lon="103.854580">
+        <ele>3</ele>
+        <time>2025-11-06T12:00:00Z</time>
+      </trkpt>
+      <trkpt lat="1.285500" lon="103.857000">
+        <ele>5</ele>
+        <time>2025-11-06T12:05:00Z</time>
+      </trkpt>
+      <trkpt lat="1.283690" lon="103.860540">
+        <ele>5</ele>
+        <time>2025-11-06T12:10:00Z</time>
+      </trkpt>
+      <trkpt lat="1.282000" lon="103.862000">
+        <ele>8</ele>
+        <time>2025-11-06T12:15:00Z</time>
+      </trkpt>
+      <trkpt lat="1.281570" lon="103.863630">
+        <ele>8</ele>
+        <time>2025-11-06T12:20:00Z</time>
+      </trkpt>
+      <trkpt lat="1.283000" lon="103.861000">
+        <ele>5</ele>
+        <time>2025-11-06T12:25:00Z</time>
+      </trkpt>
+      <trkpt lat="1.286890" lon="103.854580">
+        <ele>3</ele>
+        <time>2025-11-06T12:30:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+  
+</gpx>

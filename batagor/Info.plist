@@ -2,7 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need your location to tag your photos and videos</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>We need your location to tag your photos and videos</string>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>$(MainAppBundleIdentifier)</string>
 	</array>
@@ -23,6 +27,10 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>GroupAppBundleIdentifier</key>
+	<string>group.com.fuad.batagor</string>
+	<key>MainAppBundleIdentifier</key>
+	<string>com.fuad.batagor</string>
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>
@@ -36,9 +44,5 @@
 	</array>
 	<key>UIBackgroundModes</key>
 	<array/>
-	<key>MainAppBundleIdentifier</key>
-	<string>com.tudemaha.batagor</string>
-	<key>GroupAppBundleIdentifier</key>
-	<string>group.com.tudemaha.batagor</string>
 </dict>
 </plist>

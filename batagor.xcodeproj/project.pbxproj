@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		065135842EBC848700DE7404 /* apple park.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 065135832EBC848000DE7404 /* apple park.gpx */; };
+		065135862EBC86B300DE7404 /* marina_bay.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 065135852EBC86AA00DE7404 /* marina_bay.gpx */; };
 		3F764C732EB09ED70028EDD1 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FDD00D72EAF506300E14B66 /* WidgetKit.framework */; };
 		3F764C742EB09ED70028EDD1 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FDD00D92EAF506300E14B66 /* SwiftUI.framework */; };
 		3F764C832EB09ED80028EDD1 /* widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3F764C722EB09ED70028EDD1 /* widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -38,6 +40,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		065135832EBC848000DE7404 /* apple park.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "apple park.gpx"; sourceTree = "<group>"; };
+		065135852EBC86AA00DE7404 /* marina_bay.gpx */ = {isa = PBXFileReference; lastKnownFileType = text; path = marina_bay.gpx; sourceTree = "<group>"; };
 		3F764C722EB09ED70028EDD1 /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F764C892EB0A8970028EDD1 /* widgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = widgetExtension.entitlements; sourceTree = "<group>"; };
 		3F764C8E2EB0A96C0028EDD1 /* SwiftData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftData.framework; path = System/Library/Frameworks/SwiftData.framework; sourceTree = SDKROOT; };
@@ -126,6 +130,8 @@
 		9E61FA002EA75DD200053854 = {
 			isa = PBXGroup;
 			children = (
+				065135852EBC86AA00DE7404 /* marina_bay.gpx */,
+				065135832EBC848000DE7404 /* apple park.gpx */,
 				3F764C892EB0A8970028EDD1 /* widgetExtension.entitlements */,
 				9E61FA0B2EA75DD200053854 /* batagor */,
 				3F764C752EB09ED70028EDD1 /* widget */,
@@ -242,6 +248,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				065135842EBC848700DE7404 /* apple park.gpx in Resources */,
+				065135862EBC86B300DE7404 /* marina_bay.gpx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,7 +289,7 @@
 				CODE_SIGN_ENTITLEMENTS = widgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3QGY9BFW95;
+				DEVELOPMENT_TEAM = 4D8MTY7F2R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = widget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = widget;
@@ -292,7 +300,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fuad.batagor.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -309,7 +317,7 @@
 				CODE_SIGN_ENTITLEMENTS = widgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3QGY9BFW95;
+				DEVELOPMENT_TEAM = 4D8MTY7F2R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = widget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = widget;
@@ -320,7 +328,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fuad.batagor.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -457,7 +465,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"batagor/Preview Content\"";
-				DEVELOPMENT_TEAM = 3QGY9BFW95;
+				DEVELOPMENT_TEAM = 4D8MTY7F2R;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = batagor/Info.plist;
@@ -473,7 +481,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fuad.batagor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -490,7 +498,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"batagor/Preview Content\"";
-				DEVELOPMENT_TEAM = 3QGY9BFW95;
+				DEVELOPMENT_TEAM = 4D8MTY7F2R;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = batagor/Info.plist;
@@ -506,7 +514,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fuad.batagor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
