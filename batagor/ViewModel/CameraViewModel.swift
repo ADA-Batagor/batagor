@@ -73,7 +73,16 @@ class CameraViewModel: ObservableObject {
             let thumbnailPath = storageManager.saveThumbnail(photo)
             
             if let mainPath = mainPath, let thumbnailPath = thumbnailPath {
-                let storage = Storage(createdAt: Date(), expiredAt: 5 * 60, mainPath: mainPath, thumbnailPath: thumbnailPath)
+                // --- START OF CHANGES ---
+                                let fileManager = FileManager.default
+                                let mainSize = fileManager.getSizeOfFile(at: mainPath)
+                                let thumbSize = fileManager.getSizeOfFile(at: thumbnailPath)
+                                let totalSize = mainSize + thumbSize
+                                
+                                // Use the updated initializer with file size
+                                let storage = Storage(createdAt: Date(), expiredAt: 5 * 60, mainPath: mainPath, thumbnailPath: thumbnailPath, fileSizeInBytes: totalSize)
+                                // --- END OF CHANGES ---
+                
                 context.insert(storage)
                 print("Added \(mainPath)")
             }
@@ -97,8 +106,15 @@ class CameraViewModel: ObservableObject {
             do {
                 let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
                 if let thumbnailURL = storageManager.saveThumbnail(UIImage(cgImage: cgImage)) {
-                    let storage = Storage(createdAt: Date(), expiredAt: 30, mainPath: movieURL, thumbnailPath: thumbnailURL)
-                    context.insert(storage)
+                    // --- START OF CHANGES ---
+                                        let fileManager = FileManager.default
+                                        let mainSize = fileManager.getSizeOfFile(at: movieURL)
+                                        let thumbSize = fileManager.getSizeOfFile(at: thumbnailURL)
+                                        let totalSize = mainSize + thumbSize
+
+                                        // Use the updated initializer with file size
+                                        let storage = Storage(createdAt: Date(), expiredAt: 30, mainPath: movieURL, thumbnailPath: thumbnailURL, fileSizeInBytes: totalSize)
+                                        // --- END OF CHANGES ---                    context.insert(storage)
                     try? context.save()
                 }
             } catch {

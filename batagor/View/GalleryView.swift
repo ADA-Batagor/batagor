@@ -22,6 +22,9 @@ struct GalleryView: View {
             allPhotos.filter { $0.expiredAt > Date() }
         }
     
+    // --- ADDED ---
+        @State private var showingSpaceClearedView = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -51,6 +54,22 @@ struct GalleryView: View {
                 }
             }
             .navigationTitle("Gallery")
+            // --- ADDED ---
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                Button {
+                                    showingSpaceClearedView = true
+                                } label: {
+                                    Image(systemName: "sparkles")
+                                    Text("Space Saved")
+                                }
+                            }
+                        }
+                        .sheet(isPresented: $showingSpaceClearedView) {
+                            // This presents the new view you created
+                            TotalSpaceClearedView()
+                        }
+                        // --- END OF ADDITIONS ---
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if newPhase == .background {

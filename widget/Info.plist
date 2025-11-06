@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>MainAppBundleIdentifier</key>
-	<string>com.tudemaha.batagor</string>
+	<string>com.fuad.batagor</string>
 	<key>GroupAppBundleIdentifier</key>
-	<string>group.com.tudemaha.batagor</string>
+	<string>group.com.fuad.batagor</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>

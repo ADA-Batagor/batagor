@@ -278,7 +278,8 @@ extension GalleryEntry {
             Storage(
                 mainPath: URL(fileURLWithPath: "/tmp/sample\(index).jpg"),
                 thumbnailPath: URL(fileURLWithPath:
-                                    "/tmp/sample\(index)_thumb.jpg")
+                                    "/tmp/sample\(index)_thumb.jpg"),
+                fileSizeInBytes: 0
             )
         }
     }

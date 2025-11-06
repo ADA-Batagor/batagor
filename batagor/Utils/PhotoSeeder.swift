@@ -30,7 +30,19 @@ class PhotoSeeder {
             let dummyPhoto = createDummyPhoto(color: color, label: labels[index])
             
             if let fileURL = StorageManager.shared.savePhoto(dummyPhoto) {
-                let file = Storage(createdAt: Date(), expiredAt: expirationTimes[index], mainPath: fileURL, thumbnailPath: fileURL)
+                // --- START OF FIX ---
+                                // Get the size of the file we just saved
+                                var fileSize: Int64 = 0
+                                do {
+                                    let attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path())
+                                    fileSize = (attributes[.size] as? NSNumber)?.int64Value ?? 0
+                                } catch {
+                                    print("Error getting file size for seeder: \(error)")
+                                }
+
+                                // Pass the file size to the updated initializer
+                                let file = Storage(createdAt: Date(), expiredAt: expirationTimes[index], mainPath: fileURL, thumbnailPath: fileURL, fileSizeInBytes: fileSize)
+                                // --- END OF FIX ---
                 modelContext.insert(file)
                 print("Added \(labels[index]) - expires in \(expirationTimes[index])s")
             }
