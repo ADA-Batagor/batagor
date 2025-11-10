@@ -16,6 +16,7 @@ struct DetailView: View {
     
     @State private var showToolbar: Bool = true
     @State private var showDeleteConfirmation: Bool = false
+    @State private var selectedThumbnail: Storage?
     
     //    gesture state
     @State private var offset: CGSize = .zero
@@ -40,7 +41,7 @@ struct DetailView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack {
                         ForEach(storages, id: \.self) { storage in
-                            GeometryReader { geo in
+                            ZStack {
                                 if let uiImage = StorageManager.shared.loadUIImage(fileURL: storage.mainPath) {
                                     Image(uiImage: uiImage)
                                         .resizable()
@@ -117,13 +118,16 @@ struct DetailView: View {
                     }
                     .scrollTargetLayout()
                 }
+                .scrollPosition(id: $selectedThumbnail)
                 .scrollTargetBehavior(.viewAligned)
                 .safeAreaPadding(.vertical, 80)
                 .onAppear {
                     proxy.scrollTo(selectedStorage?.id)
+                    selectedThumbnail = selectedStorage
                 }
                 .onChange(of: selectedStorage) { _, newValue in
                     proxy.scrollTo(newValue?.id)
+                    selectedThumbnail = selectedStorage
                 }
             }
             
@@ -148,24 +152,26 @@ struct DetailView: View {
                     Spacer()
                     
                     if !isZoomed {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(alignment: .bottom) {
-                                ForEach(storages) { storage in
-                                    if let thumbnail = StorageManager.shared.loadUIImage(fileURL: storage.thumbnailPath) {
-                                        Image(uiImage: thumbnail)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .clipShape(.rect(cornerRadius: 2))
-                                            .containerRelativeFrame(.horizontal) { width, _ in
-                                                storage.id == selectedStorage?.id ? width * 0.065 : width * 0.05
-                                            }
-                                            .padding(.horizontal, storage.id == selectedStorage?.id ? 8 : 0)
-                                            .onTapGesture {
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    vibrateLight()
-                                                    selectedStorage = storage
+                        ScrollViewReader { proxy in
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(alignment: .bottom, spacing: 3) {
+                                    ForEach(storages, id: \.self) { storage in
+                                        if let thumbnail = StorageManager.shared.loadUIImage(fileURL: storage.thumbnailPath) {
+                                            Image(uiImage: thumbnail)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .clipShape(.rect(cornerRadius: 2))
+                                                .containerRelativeFrame(.horizontal) { width, _ in
+                                                    storage.id == selectedThumbnail?.id ? width * 0.065 : width * 0.05
                                                 }
-                                            }
+                                                .padding(.horizontal, storage.id == selectedThumbnail?.id ? 4 : 0)
+                                                .onTapGesture {
+                                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                                        vibrateLight()
+                                                        selectedStorage = storage
+                                                    }
+                                                }
+                                        }
                                     }
                                 }
                             }
