@@ -9,48 +9,187 @@ import SwiftUI
 import SwiftData
 
 struct GalleryView: View {
+    let TOP_SCROLL_THRESHOLD: CGFloat = 145
+    let BOTTOM_SCROLL_THRESHOLD: CGFloat = 135
+    
     @EnvironmentObject var timer: SharedTimerManager
     @EnvironmentObject var navigationManager: NavigationManager
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     
+    // Select variables
+    @State private var isSelectionMode = false
+    @State private var isSelected = false
+    @State private var selectedMediaIds: Set<UUID> = []
+    @State private var lastScrollPosition: CGFloat = 0
+    
+    // Scroll variables
+    @State private var isScrolled = false
+    @State private var scrollOffset: CGFloat = 0
+    
+    // Delete variables
+    @State private var mediaToDelete: Storage?
+    @State private var isDeletingMedia: Bool = false
+    @State private var isDeletingSelectedMedia: Bool = false
+    @State private var swipedPhotoId: UUID? = nil
+    @State private var swipeOffsets: [UUID: CGFloat] = [:]
+    @State private var shouldAnimateSwipe: Set<UUID> = []
+    @State private var isDragging: Set<UUID> = []
+    @State private var hapticTrigger = false
+    @State private var hapticGenerator = UIImpactFeedbackGenerator(style: .medium)
+    
     @Query(sort: \Storage.createdAt, order: .reverse)
-        private var allPhotos: [Storage]
-
-        private var photos: [Storage] {
-            allPhotos.filter { $0.expiredAt > Date() }
-        }
+    private var allPhotos: [Storage]
+    
+    private var photos: [Storage] {
+        allPhotos.filter { $0.expiredAt > Date() }
+    }
+    
+    private var shouldShowScrolledState: Bool {
+        photos.count > 0 && isScrolled
+    }
     
     var body: some View {
         NavigationStack {
             ZStack {
-                if photos.isEmpty {
-                    emptyStateView
-                } else {
-                    galleryGridView
+                VStack(spacing: 0) {
+                    if photos.isEmpty {
+                        EmptyStateView
+                    } else {
+                        GalleryListView
+                    }
                 }
+                
                 VStack {
                     Spacer()
-                    HStack {
-                        Spacer()
-                        Button {
-                            navigationManager.navigate(to: .camera)
-                        } label: {
-                            Image(systemName: "camera.fill")
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                                .frame(width: 60, height: 60)
-                                .background(Color.brown)
-                                .clipShape(Circle())
-                                .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+                    if isSelectionMode {
+                        HStack {
+                            Button {
+                                // Share
+                            } label : {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.spaceGroteskBold(size: 17))
+                                    .foregroundStyle(.black)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
+                            .background(Color.batagorPrimary)
+                            .cornerRadius(20)
+                            
+                            Spacer()
+                            
+                            HStack {
+                                Text("\(selectedMediaIds.count) Media Selected")
+                                    .font(.spaceGroteskSemiBold(size: 17))
+                                    .foregroundStyle(.black)
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 14)
+                            .background(Color.batagorAccent)
+                            .cornerRadius(20)
+                            
+                            Spacer()
+                            
+                            Button {
+                                if !selectedMediaIds.isEmpty {
+                                    isDeletingSelectedMedia = true
+                                }
+                            } label : {
+                                Image(systemName: "trash")
+                                    .font(.spaceGroteskBold(size: 17))
+                                    .foregroundStyle(.black)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
+                            .background(Color.batagorPrimary)
+                            .cornerRadius(20)
+                        }
+                        .padding(.horizontal)
+                    } else {
+                        HStack {
+                            Spacer()
+                            Button {
+                                navigationManager.navigate(to: .camera)
+                            } label: {
+                                HStack {
+                                    Image(systemName: "camera")
+                                        .font(.spaceGroteskSemiBold(size: 17))
+                                        .foregroundStyle(.black)
+                                    Text("Add media")
+                                        .font(.spaceGroteskSemiBold(size: 17))
+                                        .foregroundStyle(.black)
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 14)
+                                .background(Color.batagorPrimary)
+                                .cornerRadius(20)
+                            }
+                            Spacer()
                         }
                     }
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 20)
+                    
+                }
+                .background(alignment: .bottom) {
+                    VStack {
+                        Spacer()
+                        LinearGradient(
+                            stops: [
+                                Gradient.Stop(color: .batagorLight, location: 0.0),
+                                Gradient.Stop(color: .batagorLight.opacity(0.8), location: 0.3),
+                                Gradient.Stop(color: .clear, location: 1.0)
+                            ],
+                            startPoint: .bottom,
+                            endPoint: .top
+                        )
+                        .frame(height: 100)
+                    }
+                    .ignoresSafeArea()
                 }
             }
-            .navigationTitle("Gallery")
+            .onAppear {
+                hapticGenerator.prepare()
+            }
+            .background(Color.batagorLight)
+            .navigationBarTitleDisplayMode(shouldShowScrolledState ? .inline : .large)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            if !shouldShowScrolledState {
+                                Text("Library")
+                                    .font(.spaceGroteskBold(size: 34))
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
+                            GalleryCount(currentCount: photos.count)
+                        }
+                        .padding(.top, shouldShowScrolledState ? 0 : 90)
+                        .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
+                    }
+                    
+                    ToolbarItem(placement: .topBarTrailing) {
+                        SelectButton
+                            .padding(.top, shouldShowScrolledState ? 0 : 50)
+                            .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
+                    }
+            }
+            .overlay(alignment: .top) {
+                if shouldShowScrolledState {
+                    LinearGradient(
+                        stops: [
+                            Gradient.Stop(color: .batagorLight, location: 0.0),
+                            Gradient.Stop(color: .batagorLight.opacity(0.8), location: 0.6),
+                            Gradient.Stop(color: .clear, location: 1.0)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 120)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                }
+            }
+            
+            
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if newPhase == .background {
@@ -65,40 +204,283 @@ struct GalleryView: View {
                 await DeletionService.shared.performCleanup(modelContext: modelContext)
             }
         }
+        .confirmationDialog("Delete Media", isPresented: $isDeletingMedia) {
+            Button("Delete", role: .destructive) {
+                if let media = mediaToDelete {
+                    withAnimation {
+                        deleteMedia(media)
+                    }
+                    mediaToDelete = nil
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                mediaToDelete = nil
+            }
+        } message: {
+            Text("Are you sure you want to delete this media? This action cannot be undone.")
+        }
+        .confirmationDialog("Delete Selected Media", isPresented: $isDeletingSelectedMedia) {
+            Button("Delete \(selectedMediaIds.count) Media", role: .destructive) {
+                bulkDeleteMedia()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Are you sure you want to delete \(selectedMediaIds.count) selected media? This action cannot be undone.")
+        }
+        
     }
     
-    private var galleryGridView: some View {
-        ScrollView {
-            LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: 12),
-                GridItem(.flexible(), spacing: 12)
-            ], spacing: 12) {
+    private var GalleryListView: some View {
+        List {
+            Section {
+                HStack {
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear
+                            .onChange(of: geo.frame(in: .global).minY) { oldValue, newValue in
+                                let scrollDelta = newValue - oldValue
+                                let threshold: CGFloat = isScrolled ? TOP_SCROLL_THRESHOLD : BOTTOM_SCROLL_THRESHOLD
+                                let isScrollable = newValue < threshold
+                                
+                                Task { @MainActor in
+                                    if isScrolled != isScrollable {
+                                        isScrolled = isScrollable
+                                    }
+                                    lastScrollPosition = scrollDelta
+                                }
+                            }
+                    }
+                )
+                
                 ForEach(photos) { photo in
-                    GalleryItemView(storage: photo)
+                    ZStack(alignment: .trailing) {
+                        if swipedPhotoId == photo.id {
+                            HStack {
+                                Spacer()
+                                Button {
+                                    mediaToDelete = photo
+                                    isDeletingMedia = true
+                                    withAnimation {
+                                        swipeOffsets[photo.id] = 0
+                                        swipedPhotoId = nil
+                                    }
+                                } label: {
+                                    CircularSwipeButton(icon: "trash")
+                                }
+                                .padding(.trailing, 20)
+                                .scaleEffect(swipedPhotoId == photo.id ? 1.0 : 0.0)
+                                .opacity(swipedPhotoId == photo.id ? 1.0 : 0.0)
+                            }
+                            .animation(.interpolatingSpring(stiffness: 300, damping: 15).delay(0.1), value: swipedPhotoId)
+                        }
+                        
+                        GalleryItemView(
+                            storage: photo,
+                            isSelecting: $isSelectionMode,
+                            isSelected: selectionBinding(for: photo.id),
+                            isSwiped: swipedBinding(for: photo.id)
+                        )
+                        .offset(x: swipeOffsets[photo.id] ?? 0)
+                        .animation(shouldAnimateSwipe.contains(photo.id) ? .spring(response: 0.3, dampingFraction: 0.75) : nil, value: swipeOffsets[photo.id])
+                        .simultaneousGesture(
+                            DragGesture(minimumDistance: 20, coordinateSpace: .local)
+                                .onChanged { gesture in
+                                    if isSelectionMode { return }
+                                    
+                                    isDragging.insert(photo.id)
+                                    shouldAnimateSwipe.remove(photo.id)
+                                    
+                                    let horizontalMovement = gesture.translation.width
+                                    let verticalMovement = gesture.translation.height
+                                    
+                                    if swipedPhotoId == photo.id && horizontalMovement < 0 {
+                                        return
+                                    }
+                                    
+                                    var transaction = Transaction()
+                                    transaction.disablesAnimations = true
+                                    
+                                    if abs(horizontalMovement) > abs(verticalMovement) * 1.5 && horizontalMovement < 0 {
+                                        swipeOffsets[photo.id] = max(horizontalMovement, -90)
+                                        
+                                        if horizontalMovement < -50 && !hapticTrigger {
+                                            hapticGenerator.impactOccurred()
+                                            hapticTrigger = true
+                                        } else if horizontalMovement > -50 && hapticTrigger {
+                                            hapticTrigger = false
+                                        }
+                                    } else if abs(horizontalMovement) > abs(verticalMovement) * 1.5 && horizontalMovement > 0 {
+                                        if swipedPhotoId == photo.id {
+                                            let resistance = horizontalMovement * 0.3
+                                            swipeOffsets[photo.id] = min(-90 + resistance, 0)
+                                        }
+                                    }
+                                    
+                                }
+                                .onEnded { gesture in
+                                    if let previousId = swipedPhotoId, previousId != photo.id {
+                                        shouldAnimateSwipe.insert(previousId)
+                                        swipeOffsets[previousId] = 0
+                                    }
+                                    
+                                    if isSelectionMode { return }
+
+                                    isDragging.remove(photo.id)
+                                    hapticTrigger = false
+                                    
+                                    let horizontalMovement = gesture.translation.width
+                                    let verticalMovement = gesture.translation.height
+                                    
+                                    if abs(horizontalMovement) > abs(verticalMovement) * 1.5 {
+                                        let threshold: CGFloat = -50
+                                        
+                                        if horizontalMovement < threshold {
+                                            if let previousId = swipedPhotoId, previousId != photo.id {
+                                                swipeOffsets[previousId] = 0
+                                            }
+
+                                            shouldAnimateSwipe.insert(photo.id)
+                                            swipeOffsets[photo.id] = -90
+                                            swipedPhotoId = photo.id
+                                        } else {
+                                            shouldAnimateSwipe.insert(photo.id)
+                                            swipeOffsets[photo.id] = 0
+                                            if swipedPhotoId == photo.id {
+                                                swipedPhotoId = nil
+                                            }
+                                        }
+                                    } else {
+                                        shouldAnimateSwipe.insert(photo.id)
+                                        swipeOffsets[photo.id] = 0
+                                    }
+                                    
+                                    
+                                }
+                        )
+                        .contentShape(Rectangle())  
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 17)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.batagorLight)
+                }
+            }
+            .listSectionSeparator(.hidden)
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .onChange(of: swipedPhotoId) { oldValue, newValue in
+            if let oldId = oldValue, newValue != oldId {
+                swipeOffsets[oldId] = 0
+            }
+        }
+        
+    }
+    
+    private var EmptyStateView: some View {
+        VStack(spacing: 0) {
+            Spacer()
+            
+            VStack(spacing: 20) {
+                Image(systemName: "photo.on.rectangle.angled")
+                    .font(.system(size: 80))
+                    .foregroundStyle(.gray)
+                
+                VStack(spacing: 4) {
+                    Text("No media")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                    
+                    Text("Captured media will appear here")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
                 }
             }
             .padding()
+            Spacer()
+        }
+        .padding(.horizontal)
+        
+    }
+    
+    private var SelectButton: some View {
+        Button {
+            if isSelectionMode {
+                selectedMediaIds.removeAll()
+                swipedPhotoId = nil
+                isSelectionMode = false
+            } else {
+                swipedPhotoId = nil
+                isSelectionMode = true
+            }
+        } label: {
+            Text(isSelectionMode ? "Cancel": "Select")
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .foregroundStyle(.black)
+                .background(Color.batagorSecondary)
+                .cornerRadius(10)
         }
     }
-
-    private var emptyStateView: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "photo.on.rectangle.angled")
-                .font(.system(size: 80))
-                .foregroundStyle(.gray)
-            
-            Text("No Photos")
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            Text("Captured photos will appear here")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-        }.padding()
+    
+    private func deleteMedia(_ media: Storage) {
+        modelContext.delete(media)
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed to delete photo: \(error.localizedDescription)")
+        }
+    }
+    
+    private func bulkDeleteMedia() {
+        let mediaToDelete = photos.filter { selectedMediaIds.contains($0.id) }
+        
+        for media in mediaToDelete {
+            modelContext.delete(media)
+        }
+        
+        do {
+            try modelContext.save()
+            withAnimation {
+                selectedMediaIds.removeAll()
+                isSelectionMode = false
+            }
+        } catch {
+            print("Failed to delete selected photos: \(error.localizedDescription)")
+        }
+    }
+    
+    private func selectionBinding(for mediaId: UUID) -> Binding<Bool> {
+        Binding(
+            get: { selectedMediaIds.contains(mediaId) },
+            set: { newValue in
+                if newValue {
+                    selectedMediaIds.insert(mediaId)
+                } else {
+                    selectedMediaIds.remove(mediaId)
+                }
+            }
+        )
+    }
+    
+    private func swipedBinding(for mediaId: UUID) -> Binding<Bool> {
+        Binding(
+            get: { swipedPhotoId == mediaId },
+            set: { newValue in
+                if newValue {
+                    swipedPhotoId = mediaId
+                } else {
+                    swipedPhotoId = nil
+                }
+            }
+        )
     }
 }
-
-
 
 #Preview {
     GalleryView()
