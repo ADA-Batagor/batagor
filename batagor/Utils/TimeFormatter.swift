@@ -10,15 +10,22 @@ import Foundation
 class TimeFormatter {
     static func formatTimeRemaining(_ interval: TimeInterval) -> String {
         let hours = Int(interval) / 3600
-        let minutes = (Int(interval) % 3600) / 60
-        let seconds = Int(interval) % 60
         
         if hours > 0 {
-            return String(format: "%dh %dm", hours, minutes)
-        } else if minutes > 0 {
-            return String(format: "%dm %ds", minutes, seconds)
+            return String(format: "%dh", hours)
         } else {
-            return String(format: "%ds", seconds)
+            return String(format: "< 1h")
         }
+    }
+    
+    static func formatHourRemaining(_ interval: TimeInterval) -> String {
+        let hours = Int(interval) / 3600
+        
+        if hours > 0 {
+            return String(format: "%d hours left", hours)
+        } else {
+            return String(format: "less than hour left")
+        }
+        
     }
 }

@@ -16,25 +16,41 @@ struct RemainingTime: View {
     var variant: variants = .small
     
     var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "clock.fill")
-                .font(variant == .small ? .caption2 : .caption)
-            Text(TimeFormatter.formatTimeRemaining(timeRemaining))
-                .font(variant == .small ? .caption : .title2)
-                .fontWeight(.semibold)
-                .monospacedDigit()
+        if variant == .small {
+            HStack(spacing: 4) {
+                Image(systemName: "clock")
+                    .font(.spaceGroteskRegular(size: 13))
+                    .foregroundStyle(.white)
+                Text(TimeFormatter.formatTimeRemaining(timeRemaining))
+                    .font(.spaceGroteskRegular(size: 13))
+                    .foregroundStyle(.white)
+                    .monospacedDigit()
+            }
+            .padding(.horizontal, 10)
+            .onAppear{
+                updateTimeRemaining()
+            }
+            .onChange(of: timer.currentTime) {
+                updateTimeRemaining()
+            }
+        } else {
+            HStack(spacing: 4) {
+                Text((TimeFormatter.formatHourRemaining(timeRemaining)))
+                    .font(.spaceGroteskRegular(size: 24))
+                    .foregroundStyle(.black)
+                    .monospacedDigit()
+            }
+            .padding(.horizontal, 10)
+            .background(.batagorPrimary)
+            .cornerRadius(12)
+            .onAppear{
+                updateTimeRemaining()
+            }
+            .onChange(of: timer.currentTime) {
+                updateTimeRemaining()
+            }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(variant == .small ? .ultraThinMaterial : .thickMaterial)
-        .cornerRadius(variant == .small ? 8 : 12)
-        .padding(8)
-        .onAppear{
-            updateTimeRemaining()
-        }
-        .onChange(of: timer.currentTime) {
-            updateTimeRemaining()
-        }
+        
         
     }
     

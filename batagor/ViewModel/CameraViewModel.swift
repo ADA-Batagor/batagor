@@ -12,6 +12,9 @@ import WidgetKit
 
 @MainActor
 class CameraViewModel: ObservableObject {
+    let PHOTO_EXPIRY_TIME = 24 * 60 * 60
+    let VIDEO_EXPIRY_TIME = 24 * 60 * 60
+    
     let camera = CameraManager()
     let storageManager = StorageManager.shared
     
@@ -73,7 +76,7 @@ class CameraViewModel: ObservableObject {
             let thumbnailPath = storageManager.saveThumbnail(photo)
             
             if let mainPath = mainPath, let thumbnailPath = thumbnailPath {
-                let storage = Storage(createdAt: Date(), expiredAt: 5 * 60, mainPath: mainPath, thumbnailPath: thumbnailPath)
+                let storage = Storage(createdAt: Date(), expiredAt: TimeInterval(PHOTO_EXPIRY_TIME), mainPath: mainPath, thumbnailPath: thumbnailPath)
                 context.insert(storage)
                 print("Added \(mainPath)")
             }
@@ -97,7 +100,7 @@ class CameraViewModel: ObservableObject {
             do {
                 let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
                 if let thumbnailURL = storageManager.saveThumbnail(UIImage(cgImage: cgImage)) {
-                    let storage = Storage(createdAt: Date(), expiredAt: 30, mainPath: movieURL, thumbnailPath: thumbnailURL)
+                    let storage = Storage(createdAt: Date(), expiredAt: TimeInterval(VIDEO_EXPIRY_TIME), mainPath: movieURL, thumbnailPath: thumbnailURL)
                     context.insert(storage)
                     try? context.save()
                 }
