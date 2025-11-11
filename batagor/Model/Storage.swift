@@ -20,6 +20,7 @@ class Storage {
     var longitude: Double?
     var altitude: Double?
     var locationName: String?
+    var locationCity: String?
     
     var isExpired: Bool {
         return Date() > expiredAt

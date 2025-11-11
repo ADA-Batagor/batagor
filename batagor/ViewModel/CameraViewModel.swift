@@ -20,6 +20,7 @@ class CameraViewModel: ObservableObject {
     let storageManager = StorageManager.shared
     let orientationManager = OrientationManager.shared
     let locationManager = LocationManager()
+    let geocodeManager = ReverseGeocodeManager()
     
     @Published var previewImage: Image?
     @Published var photoTaken: PhotoData?
@@ -89,6 +90,9 @@ class CameraViewModel: ObservableObject {
                     thumbnailPath: thumbnailPath,
                     location: locationManager.currentLocation
                 )
+                
+                storeLocation(storage: storage)
+                
                 context.insert(storage)
                 print("Added \(mainPath) with location: \(locationManager.currentLocation?.coordinate.latitude ?? 0), \(locationManager.currentLocation?.coordinate.longitude ?? 0)")
             }
@@ -120,6 +124,9 @@ class CameraViewModel: ObservableObject {
                         thumbnailPath: thumbnailURL,
                         location: locationManager.currentLocation
                     )
+                    
+                    storeLocation(storage: storage)
+                    
                     context.insert(storage)
                     try? context.save()
                 }
@@ -147,6 +154,22 @@ class CameraViewModel: ObservableObject {
         let imageSize = (width: Int(photoDimentions.width), height: Int(photoDimentions.height))
         
         return PhotoData(image: image, imageData: imageData, imageSize: imageSize)
+    }
+    
+    private func storeLocation(storage: Storage) {
+        if let location = locationManager.currentLocation {
+            Task {
+                let coordinate = location.coordinate
+                await geocodeManager.reverseGeocode(coordinate: coordinate)
+                
+                if let placemarkInfo = geocodeManager.placemarkInfo {
+                    storage.locationName = placemarkInfo.displayName
+                    storage.locationCity = placemarkInfo.locality
+                }
+                
+                geocodeManager.reset()
+            }
+        }
     }
 }
 

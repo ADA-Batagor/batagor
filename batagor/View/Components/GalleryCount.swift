@@ -10,7 +10,7 @@ import SwiftUI
 struct GalleryCount: View {
     let currentCount: Int
     let totalLimit: Int = 24
-    var foregroundColor: Color = .batagorDark
+    var foregroundColor: Color = Color.darkBase
     var countOnly: Bool = false
     
     var body: some View {

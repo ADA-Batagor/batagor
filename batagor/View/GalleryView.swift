@@ -11,6 +11,7 @@ import SwiftData
 struct GalleryView: View {
     let TOP_SCROLL_THRESHOLD: CGFloat = 145
     let BOTTOM_SCROLL_THRESHOLD: CGFloat = 135
+    let MEDIA_LIMIT = 24
     
     @EnvironmentObject var timer: SharedTimerManager
     @EnvironmentObject var navigationManager: NavigationManager
@@ -39,6 +40,9 @@ struct GalleryView: View {
     @State private var hapticTrigger = false
     @State private var hapticGenerator = UIImpactFeedbackGenerator(style: .medium)
     
+    // Toast
+    @State private var showLimitToast: Bool = false
+    
     @Query(sort: \Storage.createdAt, order: .reverse)
     private var allPhotos: [Storage]
     
@@ -65,7 +69,17 @@ struct GalleryView: View {
                     Spacer()
                     if isSelectionMode {
                         HStack {
-                            BulkShare
+                            Button {
+                                BulkShare
+                            } label : {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.spaceGroteskBold(size: 17))
+                                    .foregroundStyle(.black)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
+                            .background(Color.blueBase)
+                            .cornerRadius(20)
                             
                             Spacer()
                             
@@ -76,7 +90,7 @@ struct GalleryView: View {
                             }
                             .padding(.horizontal, 20)
                             .padding(.vertical, 14)
-                            .background(Color.batagorAccent)
+                            .background(Color.accentBase)
                             .cornerRadius(20)
                             
                             Spacer()
@@ -92,7 +106,7 @@ struct GalleryView: View {
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 14)
-                            .background(Color.batagorPrimary)
+                            .background(Color.blueBase)
                             .cornerRadius(20)
                             .disabled(selectedMediaIds.isEmpty ? true : false)
                         }
@@ -101,19 +115,26 @@ struct GalleryView: View {
                         HStack {
                             Spacer()
                             Button {
-                                navigationManager.navigate(to: .camera)
+                                if photos.count < 24 {
+                                    navigationManager.navigate(to: .camera)
+                                } else {
+                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                        showLimitToast = true
+                                    }
+                                }
+                                
                             } label: {
                                 HStack {
                                     Image(systemName: "camera")
                                         .font(.spaceGroteskSemiBold(size: 17))
-                                        .foregroundStyle(.black)
+                                        .foregroundStyle(photos.count < MEDIA_LIMIT ? Color.darkBase : Color.light50)
                                     Text("Add media")
                                         .font(.spaceGroteskSemiBold(size: 17))
-                                        .foregroundStyle(.black)
+                                        .foregroundStyle(photos.count < MEDIA_LIMIT ? Color.darkBase : Color.light50)
                                 }
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 14)
-                                .background(Color.batagorPrimary)
+                                .background(photos.count < MEDIA_LIMIT ? Color.blueBase : Color.dark20)
                                 .cornerRadius(20)
                             }
                             Spacer()
@@ -126,8 +147,8 @@ struct GalleryView: View {
                         Spacer()
                         LinearGradient(
                             stops: [
-                                Gradient.Stop(color: .batagorLight, location: 0.0),
-                                Gradient.Stop(color: .batagorLight.opacity(0.8), location: 0.3),
+                                Gradient.Stop(color: Color.lightBase, location: 0.0),
+                                Gradient.Stop(color: Color.lightBase.opacity(0.8), location: 0.3),
                                 Gradient.Stop(color: .clear, location: 1.0)
                             ],
                             startPoint: .bottom,
@@ -141,34 +162,41 @@ struct GalleryView: View {
             .onAppear {
                 hapticGenerator.prepare()
             }
-            .background(Color.batagorLight)
+            .toast(
+                isShowing: $showLimitToast,
+                message: "Please delete media first to continue capturing.",
+                icon: "exclamationmark.triangle",
+                duration: 3.0
+            )
+            .background(Color.lightBase)
             .navigationBarTitleDisplayMode(shouldShowScrolledState ? .inline : .large)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        if !shouldShowScrolledState {
-                            Text("Library")
-                                .font(.spaceGroteskBold(size: 34))
-                                .transition(.opacity.combined(with: .move(edge: .top)))
+                        VStack(alignment: .leading, spacing: 0) {
+                            if !shouldShowScrolledState {
+                                Text("Library")
+                                    .font(.spaceGroteskBold(size: 34))
+                                    .foregroundStyle(Color.darkerBlueBase)
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
+                            GalleryCount(currentCount: photos.count)
                         }
-                        GalleryCount(currentCount: photos.count)
-                    }
-                    .padding(.top, shouldShowScrolledState ? 0 : 90)
-                    .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
-                }
-                
-                ToolbarItem(placement: .topBarTrailing) {
-                    SelectButton
-                        .padding(.top, shouldShowScrolledState ? 0 : 50)
+                        .padding(.top, shouldShowScrolledState ? 0 : 90)
                         .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
-                }
+                    }
+                    
+                    ToolbarItem(placement: .topBarTrailing) {
+                        SelectButton
+                            .padding(.top, shouldShowScrolledState ? 0 : 50)
+                            .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
+                    }
             }
             .overlay(alignment: .top) {
                 if shouldShowScrolledState {
                     LinearGradient(
                         stops: [
-                            Gradient.Stop(color: .batagorLight, location: 0.0),
-                            Gradient.Stop(color: .batagorLight.opacity(0.8), location: 0.6),
+                            Gradient.Stop(color: Color.lightBase, location: 0.0),
+                            Gradient.Stop(color: Color.lightBase.opacity(0.8), location: 0.6),
                             Gradient.Stop(color: .clear, location: 1.0)
                         ],
                         startPoint: .top,
@@ -246,6 +274,36 @@ struct GalleryView: View {
                             }
                     }
                 )
+                
+                if photos.count >= MEDIA_LIMIT {
+                    HStack {
+                        HStack(spacing: 10) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .resizable()
+                                .fontWeight(.semibold)
+                                .frame(width: 24, height: 24)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Limit Exceeded!")
+                                    .font(.spaceGroteskBold(size: 17))
+                                    .foregroundStyle(Color.darkBase)
+                                Text("You have used all storage. Delete media to continue.")
+                                    .font(.spaceGroteskRegular(size: 17))
+                                    .foregroundStyle(Color.darkBase)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 20)
+                    .background(Color.yellow50)
+                    .cornerRadius(20)
+                    .padding(.horizontal)
+                    .padding(.bottom, 17)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.lightBase)
+                }
+                
                 
                 ForEach(photos) { photo in
                     ZStack(alignment: .trailing) {
@@ -358,7 +416,7 @@ struct GalleryView: View {
                     .padding(.bottom, 17)
                     .listRowInsets(EdgeInsets())
                     .listRowSeparator(.hidden)
-                    .listRowBackground(Color.batagorLight)
+                    .listRowBackground(Color.lightBase)
                 }
             }
             .listSectionSeparator(.hidden)
@@ -411,11 +469,11 @@ struct GalleryView: View {
             }
         } label: {
             Text(isSelectionMode ? "Cancel": "Select")
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .foregroundStyle(.black)
-                .background(Color.batagorSecondary)
-                .cornerRadius(10)
+                .padding(.horizontal, 15)
+                .padding(.vertical, 7)
+                .foregroundStyle(Color.darkBase)
+                .background(Color.yellow30)
+                .cornerRadius(40)
         }
     }
     

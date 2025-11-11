@@ -39,12 +39,6 @@ struct GalleryItemView: View {
                     }
             }
         }
-        .task {
-            if let latitude = storage.latitude, let longitude = storage.longitude {
-                let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                await geocodeManager.reverseGeocode(coordinate: coordinate)
-            }
-        }
         .overlay(alignment: .bottom) {
             if !isSelecting {
                 ZStack(alignment: .bottom) {
@@ -60,7 +54,7 @@ struct GalleryItemView: View {
                     .frame(height: 80)
                     
                     ProgressView(value: Double(storage.timeRemaining), total: 86400)
-                        .progressViewStyle(LinearProgressViewStyle(tint: .batagorPrimary))
+                        .progressViewStyle(LinearProgressViewStyle(tint: Color.blueBase))
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                         .frame(height: 6)
                     VStack {
@@ -70,18 +64,14 @@ struct GalleryItemView: View {
                             Spacer()
                             
                             HStack {
-                                if geocodeManager.isLoading {
-                                    Text("Locating...")
+                                if let locationName = storage.locationName {
+                                    Text(locationName)
                                         .font(.spaceGroteskRegular(size: 13))
-                                        .foregroundColor(.batagorLight)
-                                } else if let placemarkInfo = geocodeManager.placemarkInfo {
-                                    Text(placemarkInfo.displayName)
-                                        .font(.spaceGroteskRegular(size: 13))
-                                        .foregroundColor(.batagorLight)
+                                        .foregroundColor(Color.lightBase)
                                 } else {
                                     Text("No location")
                                         .font(.spaceGroteskRegular(size: 13))
-                                        .foregroundColor(.batagorLight)
+                                        .foregroundColor(Color.lightBase)
                                 }
                             }
                             .padding(.horizontal, 8)
@@ -104,15 +94,15 @@ struct GalleryItemView: View {
              if isSelecting && isSelected {
                 ZStack(alignment: .topLeading) {
                     RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(Color.batagorPrimary, lineWidth: 3)
+                        .strokeBorder(Color.blueBase, lineWidth: 3)
                     
                     Circle()
-                        .fill(Color.batagorPrimary)
+                        .fill(Color.blueBase)
                         .frame(width: 28, height: 28)
                         .overlay(
                             Image(systemName: "checkmark")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.batagorDark)
+                                .foregroundColor(Color.darkBase)
                         )
                         .padding(8)
                 }

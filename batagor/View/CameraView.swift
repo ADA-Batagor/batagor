@@ -34,7 +34,7 @@ struct Camera: View {
                 LinearGradient(
                     stops: [
                         Gradient.Stop(color: Color.rgb(red: 55, green: 64, blue: 83), location: 0.0),
-                        Gradient.Stop(color: .batagorDark, location: 1.0)
+                        Gradient.Stop(color: Color.darkBase, location: 1.0)
                     ],
                     startPoint: .bottom,
                     endPoint: .top
@@ -95,11 +95,11 @@ struct Camera: View {
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.spaceGroteskSemiBold(size: 17))
-                            .foregroundStyle(.batagorLight)
+                            .foregroundStyle(Color.lightBase)
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    GalleryCount(currentCount: storages.count, foregroundColor: .batagorLight, countOnly: true)
+                    GalleryCount(currentCount: storages.count, foregroundColor: Color.lightBase, countOnly: true)
                 }
             }
             .ignoresSafeArea(.all)
