@@ -15,11 +15,15 @@ struct CameraToolbar: View {
     
     var storageCount: Int
     var latestStorage: Storage?
+    
+    @State var selectedStorage: Storage?
+    
     @Binding var currentDuration: Double
     @Binding var isRecording: Bool
     @Binding var capturingPhoto: Bool
     
     @State private var isPressed = false
+    @State private var showCover: Bool = false
     
     var movieDurationLimit = 5.0
     var lineWidth: CGFloat = 4.0
@@ -27,7 +31,8 @@ struct CameraToolbar: View {
     var body: some View {
         HStack {
             Button {
-                navigationManager.navigate(to: .gallery)
+                selectedStorage = latestStorage
+                showCover.toggle()
             } label: {
                 if let storage = latestStorage, let uiImage = UIImage(contentsOfFile: storage.thumbnailPath.path()) {
                     Image(uiImage: uiImage)
@@ -142,6 +147,9 @@ struct CameraToolbar: View {
             .padding(15)
             .background(.black.opacity(0.5))
             .clipShape(Circle())
+        }
+        .fullScreenCover(isPresented: $showCover) {
+            DetailView(selectedStorage: $selectedStorage, showCover: $showCover)
         }
     }
 }

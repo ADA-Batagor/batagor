@@ -13,6 +13,7 @@ struct CircularProgress: View {
     var lineWidth: CGFloat = 3
     var size: CGFloat = 20
     var isShowText: Bool = false
+    var foregroundColor: Color = .batagorDark
     
     private var progress: Double {
         guard total > 0 else { return 0 }
@@ -26,7 +27,7 @@ struct CircularProgress: View {
             
             Circle()
                 .trim(from: 0, to: progress)
-                .stroke(Color.batagorDark, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                .stroke(foregroundColor, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .animation(.easeInOut, value: progress)
         }
@@ -35,7 +36,7 @@ struct CircularProgress: View {
         if isShowText {
             Text("\(current) / \(total) Media")
                 .font(.spaceGroteskMedium(size: 17))
-                .foregroundStyle(.batagorDark)
+                .foregroundStyle(foregroundColor)
         }
     }
 }

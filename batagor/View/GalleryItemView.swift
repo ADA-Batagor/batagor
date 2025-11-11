@@ -35,7 +35,6 @@ struct GalleryItemView: View {
                         }
                     }
             }
-            
         }
         .overlay(alignment: .bottom) {
             if !isSelecting {

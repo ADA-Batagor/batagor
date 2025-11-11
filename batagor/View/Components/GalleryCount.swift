@@ -10,6 +10,8 @@ import SwiftUI
 struct GalleryCount: View {
     let currentCount: Int
     let totalLimit: Int = 24
+    var foregroundColor: Color = .batagorDark
+    var countOnly: Bool = false
     
     var body: some View {
         HStack(spacing: 8) {
@@ -17,12 +19,13 @@ struct GalleryCount: View {
                 current: currentCount,
                 total: totalLimit,
                 lineWidth: 2.5,
-                size: 18
+                size: 18,
+                foregroundColor: foregroundColor
             )
             
-            Text("\(currentCount) / \(totalLimit) Media")
+            Text(countOnly ? "\(currentCount) / \(totalLimit)" : "\(currentCount) / \(totalLimit) Media")
                 .font(.spaceGroteskSemiBold(size: 17))
-                .foregroundStyle(.batagorDark)
+                .foregroundStyle(foregroundColor)
             
             Spacer()
         }

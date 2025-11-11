@@ -31,39 +31,50 @@ struct Camera: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .center) {
-                Color(.black)
+                LinearGradient(
+                    stops: [
+                        Gradient.Stop(color: Color.rgb(red: 55, green: 64, blue: 83), location: 0.0),
+                        Gradient.Stop(color: .batagorDark, location: 1.0)
+                    ],
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
                 
                 ZStack(alignment: .bottom) {
-                    Color(.black)
-                        .containerRelativeFrame(.vertical) { height, _ in
-                            height * 0.91
-                        }
-                    
-                    if let image = cameraViewModel.previewImage {
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .overlay {
-                                if capturingPhoto {
-                                    Color(.black)
-                                }
+                    GeometryReader { geometry in
+                        VStack(spacing: 0) {
+                            Spacer()
+                            if let image = cameraViewModel.previewImage {
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .overlay {
+                                        if capturingPhoto {
+                                            Color(.black)
+                                        }
+                                    }
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    .padding(.horizontal, 22)
+                                    .padding(.top, 12)
                             }
-                    }
-                    
-                    if cameraViewModel.camera.isRunning && !cameraViewModel.camera.isPreviewPaused {
-                        CameraToolbar(
-                            cameraViewModel: cameraViewModel,
-                            storageCount: storages.count,
-                            latestStorage: storages.last,
-                            currentDuration: $currentDuration,
-                            isRecording: $isRecording,
-                            capturingPhoto: $capturingPhoto
-                        )
-                        .containerRelativeFrame(.vertical) { height, _ in
-                            height * 0.15
+                            
+                            if cameraViewModel.camera.isRunning && !cameraViewModel.camera.isPreviewPaused {
+                                CameraToolbar(
+                                    cameraViewModel: cameraViewModel,
+                                    storageCount: storages.count,
+                                    latestStorage: storages.last,
+                                    currentDuration: $currentDuration,
+                                    isRecording: $isRecording,
+                                    capturingPhoto: $capturingPhoto
+                                )
+                                .containerRelativeFrame(.vertical) { height, _ in
+                                    height * 0.15
+                                }
+                                .padding(.horizontal, 40)
+                                .padding(.bottom, 30)
+                            }
                         }
-                        .padding(.horizontal, 40)
-                        .padding(.bottom, 30)
+                        .safeAreaPadding(.top)
                     }
                 }
                 .onAppear {
@@ -75,6 +86,20 @@ struct Camera: View {
                 
                 if storages.count >= 24 {
                     ErrorModal()
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        navigationManager.navigate(to: .gallery)
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.spaceGroteskSemiBold(size: 17))
+                            .foregroundStyle(.batagorLight)
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    GalleryCount(currentCount: storages.count, foregroundColor: .batagorLight, countOnly: true)
                 }
             }
             .ignoresSafeArea(.all)
