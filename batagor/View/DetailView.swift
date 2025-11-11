@@ -53,10 +53,6 @@ struct DetailView: View {
                                         .onAppear {
                                             currentPlayer.play()
                                         }
-                                        .task {
-                                            let duration = await TimeFormatter.getVideoDuration(from: storage.mainPath)
-                                            print(duration)
-                                        }
                                 } else {
                                     if let uiImage = StorageManager.shared.loadUIImage(fileURL: storage.mainPath) {
                                         Image(uiImage: uiImage)
