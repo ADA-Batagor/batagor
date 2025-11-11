@@ -14,6 +14,7 @@ import WidgetKit
 class CameraViewModel: ObservableObject {
     let camera = CameraManager()
     let storageManager = StorageManager.shared
+    let orientationManager = OrientationManager.shared
     
     @Published var previewImage: Image?
     @Published var photoTaken: PhotoData?

@@ -20,6 +20,7 @@ struct CameraToolbar: View {
     @Binding var capturingPhoto: Bool
     
     @State private var isPressed = false
+    @State private var rotation: Double = 0
     
     var movieDurationLimit = 5.0
     var lineWidth: CGFloat = 4.0
@@ -35,12 +36,14 @@ struct CameraToolbar: View {
                         .scaledToFill()
                         .clipShape(.circle)
                         .frame(width: 30)
+                        .rotationEffect(.degrees(rotation))
                 } else {
                     Image(systemName: "photo.on.rectangle")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30)
                         .foregroundStyle(Color(.white))
+                        .rotationEffect(.degrees(rotation))
                 }
             }
             .padding(15)
@@ -138,10 +141,21 @@ struct CameraToolbar: View {
                     .scaledToFit()
                     .frame(width: 30)
                     .foregroundStyle(Color(.white))
+                    .rotationEffect(.degrees(rotation))
             }
             .padding(15)
             .background(.black.opacity(0.5))
             .clipShape(Circle())
+        }
+        .onAppear {
+            withAnimation {
+                rotation = cameraViewModel.orientationManager.rotation
+            }
+        }
+        .onChange(of: cameraViewModel.orientationManager.rotation) { _, newValue in
+            withAnimation {
+                rotation = newValue
+            }
         }
     }
 }

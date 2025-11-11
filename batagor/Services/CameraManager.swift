@@ -32,6 +32,11 @@ class CameraManager: NSObject {
         ], mediaType: .video, position: .unspecified).devices
     }
     
+//    handle rotation
+    var previewLayer: AVCaptureVideoPreviewLayer?
+    private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
+    private var rotationObservation: NSKeyValueObservation?
+    
     private var frontCaptureDevices: [AVCaptureDevice] {
         allCaptureDevices.filter { $0.position == .front }
     }
@@ -114,6 +119,38 @@ class CameraManager: NSObject {
             }
         }
     }()
+    
+    func setupRotationCoordinator() {
+        guard let videoDevice = self.selectedCaptureDevice, let previewLayer = self.previewLayer else {
+            print("error setup rotation coordination")
+            return
+        }
+        
+        guard let photoOutputConnection = photoOutput?.connection(with: .video) else {
+            print("could not get photo output")
+            return
+        }
+        
+//        guard let videoOutoutConnection = videoOutput?.connection(with: .video) else {
+//            print("could not get video output")
+//            return
+//        }
+        
+        rotationCoordinator = AVCaptureDevice.RotationCoordinator(device: videoDevice, previewLayer: previewLayer)
+        
+        rotationObservation = rotationCoordinator?.observe(\.videoRotationAngleForHorizonLevelCapture, options: .new) { _, change in
+            
+            guard let newAngle = change.newValue else {
+                print("failed to get new angle value")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                photoOutputConnection.videoRotationAngle = newAngle
+//                videoOutoutConnection.videoRotationAngle = newAngle
+            }
+        }
+    }
     
     // override init
     override init() {
@@ -220,10 +257,6 @@ class CameraManager: NSObject {
             
             photoSettings.photoQualityPrioritization = .balanced
             
-            if let photoOutputVideoConnection = photoOutput.connection(with: .video) {
-                photoOutputVideoConnection.videoRotationAngle = RotationAngle.portrait.rawValue
-            }
-            
             photoOutput.capturePhoto(with: photoSettings, delegate: self)
         }
     }
@@ -281,6 +314,9 @@ class CameraManager: NSObject {
         
         photoOutput.maxPhotoQualityPrioritization = .balanced
         
+        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        setupRotationCoordinator()
+
         updateVideoOutputConnection()
         
         isCaptureSessionConfigured = true
@@ -305,6 +341,9 @@ class CameraManager: NSObject {
                 captureSession.addInput(deviceInput)
             }
         }
+        
+        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        setupRotationCoordinator()
         
         updateVideoOutputConnection()
     }
