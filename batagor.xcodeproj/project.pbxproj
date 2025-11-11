@@ -62,6 +62,7 @@
 				"Font/SpaceGrotesk-Medium.ttf",
 				"Font/SpaceGrotesk-Regular.ttf",
 				"Font/SpaceGrotesk-SemiBold.ttf",
+				Model/PlacemarkInfo.swift,
 				Model/Storage.swift,
 				Utils/SharedModelContainer.swift,
 				Utils/StorageManager.swift,

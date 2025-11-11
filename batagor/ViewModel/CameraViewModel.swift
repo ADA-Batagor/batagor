@@ -9,6 +9,7 @@ import AVFoundation
 import SwiftUI
 import SwiftData
 import WidgetKit
+import CoreLocation
 
 @MainActor
 class CameraViewModel: ObservableObject {
@@ -18,12 +19,15 @@ class CameraViewModel: ObservableObject {
     let camera = CameraManager()
     let storageManager = StorageManager.shared
     let orientationManager = OrientationManager.shared
+    let locationManager = LocationManager()
     
     @Published var previewImage: Image?
     @Published var photoTaken: PhotoData?
     @Published var movieFileURL: URL?
     
     init() {
+        locationManager.requestPermission()
+        
         Task {
             await handleCameraPreview()
         }
@@ -73,13 +77,20 @@ class CameraViewModel: ObservableObject {
     func handleSavePhoto(context: ModelContext) {
         if let image = photoTaken {
             let photo = UIImage(data: image.imageData)!
+            let photoWithLocation = locationManager.addLocationToImage(photo, location: locationManager.currentLocation)
             let mainPath = storageManager.savePhoto(photo)
             let thumbnailPath = storageManager.saveThumbnail(photo)
             
             if let mainPath = mainPath, let thumbnailPath = thumbnailPath {
-                let storage = Storage(createdAt: Date(), expiredAt: TimeInterval(PHOTO_EXPIRY_TIME), mainPath: mainPath, thumbnailPath: thumbnailPath)
+                let storage = Storage(
+                    createdAt: Date(),
+                    expiredAt: TimeInterval(PHOTO_EXPIRY_TIME),
+                    mainPath: mainPath,
+                    thumbnailPath: thumbnailPath,
+                    location: locationManager.currentLocation
+                )
                 context.insert(storage)
-                print("Added \(mainPath)")
+                print("Added \(mainPath) with location: \(locationManager.currentLocation?.coordinate.latitude ?? 0), \(locationManager.currentLocation?.coordinate.longitude ?? 0)")
             }
             
             try? context.save()
@@ -93,6 +104,7 @@ class CameraViewModel: ObservableObject {
     
     func handleSaveMovie(context: ModelContext) {
         if let movieURL = movieFileURL {
+            locationManager.addLocationToVideo(at: movieURL, location: locationManager.currentLocation)
             let asset = AVURLAsset(url: movieURL)
             let imageGenerator = AVAssetImageGenerator(asset: asset)
             imageGenerator.appliesPreferredTrackTransform = true
@@ -101,7 +113,13 @@ class CameraViewModel: ObservableObject {
             do {
                 let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
                 if let thumbnailURL = storageManager.saveThumbnail(UIImage(cgImage: cgImage)) {
-                    let storage = Storage(createdAt: Date(), expiredAt: TimeInterval(VIDEO_EXPIRY_TIME), mainPath: movieURL, thumbnailPath: thumbnailURL)
+                    let storage = Storage(
+                        createdAt: Date(),
+                        expiredAt: TimeInterval(VIDEO_EXPIRY_TIME),
+                        mainPath: movieURL,
+                        thumbnailPath: thumbnailURL,
+                        location: locationManager.currentLocation
+                    )
                     context.insert(storage)
                     try? context.save()
                 }

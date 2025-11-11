@@ -48,5 +48,9 @@
 	</array>
 	<key>UIBackgroundModes</key>
 	<array/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to tag your photos and videos</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need your location to tag your photos and videos</string>
 </dict>
 </plist>

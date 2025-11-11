@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1"
+     creator="Manual GPX Creator"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+
+  <metadata>
+    <name>Apple Park Test Location</name>
+    <desc>GPS coordinates for testing reverse geocoding at Apple Park</desc>
+    <author>
+      <name>User</name>
+    </author>
+    <time>2025-11-06T12:00:00Z</time>
+  </metadata>
+
+  <!-- Apple Park Main Building -->
+  <wpt lat="37.334900" lon="-122.009020">
+    <ele>27</ele>
+    <time>2025-11-06T12:00:00Z</time>
+    <name>Apple Park</name>
+    <desc>Apple Park - Main circular building, Cupertino, CA</desc>
+    <sym>Flag, Blue</sym>
+    <type>Corporate Campus</type>
+    <cmt>Should return "Apple Park" from reverse geocoding</cmt>
+  </wpt>
+
+  <!-- Apple Park Visitor Center -->
+  <wpt lat="37.330240" lon="-122.008620">
+    <ele>25</ele>
+    <time>2025-11-06T12:05:00Z</time>
+    <name>Apple Park Visitor Center</name>
+    <desc>Apple Park Visitor Center with retail store and cafe</desc>
+    <sym>Shopping Cart</sym>
+    <type>Visitor Center</type>
+    <cmt>Should return "Apple Park Visitor Center"</cmt>
+  </wpt>
+
+  <!-- Steve Jobs Theater -->
+  <wpt lat="37.330620" lon="-122.007050">
+    <ele>28</ele>
+    <time>2025-11-06T12:10:00Z</time>
+    <name>Steve Jobs Theater</name>
+    <desc>Steve Jobs Theater - Apple event venue</desc>
+    <sym>Building</sym>
+    <type>Theater</type>
+    <cmt>Should return "Steve Jobs Theater"</cmt>
+  </wpt>
+
+  <!-- Track around Apple Park -->
+  <trk>
+    <name>Walk Around Apple Park</name>
+    <desc>Walking route around the main Apple Park building</desc>
+    <trkseg>
+      <trkpt lat="37.335500" lon="-122.009020">
+        <ele>27</ele>
+        <time>2025-11-06T12:00:00Z</time>
+      </trkpt>
+      <trkpt lat="37.335000" lon="-122.006500">
+        <ele>27</ele>
+        <time>2025-11-06T12:03:00Z</time>
+      </trkpt>
+      <trkpt lat="37.334500" lon="-122.006000">
+        <ele>27</ele>
+        <time>2025-11-06T12:06:00Z</time>
+      </trkpt>
+      <trkpt lat="37.334000" lon="-122.007500">
+        <ele>27</ele>
+        <time>2025-11-06T12:09:00Z</time>
+      </trkpt>
+      <trkpt lat="37.334000" lon="-122.010500">
+        <ele>27</ele>
+        <time>2025-11-06T12:12:00Z</time>
+      </trkpt>
+      <trkpt lat="37.335000" lon="-122.011000">
+        <ele>27</ele>
+        <time>2025-11-06T12:15:00Z</time>
+      </trkpt>
+      <trkpt lat="37.335500" lon="-122.009020">
+        <ele>27</ele>
+        <time>2025-11-06T12:18:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+
+</gpx>

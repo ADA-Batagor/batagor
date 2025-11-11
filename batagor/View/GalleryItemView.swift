@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct GalleryItemView: View {
     let storage: Storage
@@ -16,6 +17,8 @@ struct GalleryItemView: View {
     
     @State private var selectedStorage: Storage?
     @State private var showCover: Bool = false
+    
+    @StateObject private var geocodeManager = ReverseGeocodeManager()
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
@@ -34,6 +37,12 @@ struct GalleryItemView: View {
                             showCover = true
                         }
                     }
+            }
+        }
+        .task {
+            if let latitude = storage.latitude, let longitude = storage.longitude {
+                let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                await geocodeManager.reverseGeocode(coordinate: coordinate)
             }
         }
         .overlay(alignment: .bottom) {
@@ -60,6 +69,22 @@ struct GalleryItemView: View {
                             
                             Spacer()
                             
+                            HStack {
+                                if geocodeManager.isLoading {
+                                    Text("Locating...")
+                                        .font(.spaceGroteskRegular(size: 13))
+                                        .foregroundColor(.batagorLight)
+                                } else if let placemarkInfo = geocodeManager.placemarkInfo {
+                                    Text(placemarkInfo.displayName)
+                                        .font(.spaceGroteskRegular(size: 13))
+                                        .foregroundColor(.batagorLight)
+                                } else {
+                                    Text("No location")
+                                        .font(.spaceGroteskRegular(size: 13))
+                                        .foregroundColor(.batagorLight)
+                                }
+                            }
+                            .padding(.horizontal, 8)
                         }
                         .padding(.bottom, 12)
                     }
@@ -87,7 +112,7 @@ struct GalleryItemView: View {
                         .overlay(
                             Image(systemName: "checkmark")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.white)
+                                .foregroundColor(.batagorDark)
                         )
                         .padding(8)
                 }
