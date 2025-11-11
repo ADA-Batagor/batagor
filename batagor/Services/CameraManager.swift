@@ -15,6 +15,7 @@ class CameraManager: NSObject {
     //    prepare input and output configuration
     private var isCaptureSessionConfigured = false
     private var deviceInput: AVCaptureDeviceInput?
+    private var audioInput: AVCaptureDeviceInput?
     private var photoOutput: AVCapturePhotoOutput?
     private var movieFileOutput: AVCaptureMovieFileOutput?
     
@@ -32,10 +33,27 @@ class CameraManager: NSObject {
         ], mediaType: .video, position: .unspecified).devices
     }
     
+    private var allAudioDevices: [AVCaptureDevice] {
+        AVCaptureDevice.DiscoverySession(
+            deviceTypes: [.microphone],
+            mediaType: .audio,
+            position: .unspecified
+        ).devices
+    }
+    
+    private var availableAudioDevices: [AVCaptureDevice] {
+        allAudioDevices
+            .filter( {$0.isConnected} )
+            .filter( {!$0.isSuspended} )
+    }
+    
+    private var selectedAudioDevice: AVCaptureDevice?
+    
 //    handle rotation
     var previewLayer: AVCaptureVideoPreviewLayer?
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
     private var rotationObservation: NSKeyValueObservation?
+    private var newRotationAngle: CGFloat = RotationAngle.portrait.rawValue
     
     private var frontCaptureDevices: [AVCaptureDevice] {
         allCaptureDevices.filter { $0.position == .front }
@@ -126,19 +144,9 @@ class CameraManager: NSObject {
             return
         }
         
-        guard let photoOutputConnection = photoOutput?.connection(with: .video) else {
-            print("could not get photo output")
-            return
-        }
-        
-//        guard let videoOutoutConnection = videoOutput?.connection(with: .video) else {
-//            print("could not get video output")
-//            return
-//        }
-        
         rotationCoordinator = AVCaptureDevice.RotationCoordinator(device: videoDevice, previewLayer: previewLayer)
         
-        rotationObservation = rotationCoordinator?.observe(\.videoRotationAngleForHorizonLevelCapture, options: .new) { _, change in
+        rotationObservation = rotationCoordinator?.observe(\.videoRotationAngleForHorizonLevelCapture, options: .new) { [weak self] _, change in
             
             guard let newAngle = change.newValue else {
                 print("failed to get new angle value")
@@ -146,8 +154,7 @@ class CameraManager: NSObject {
             }
             
             DispatchQueue.main.async {
-                photoOutputConnection.videoRotationAngle = newAngle
-//                videoOutoutConnection.videoRotationAngle = newAngle
+                self?.newRotationAngle = newAngle
             }
         }
     }
@@ -159,6 +166,7 @@ class CameraManager: NSObject {
         captureSession.sessionPreset = .low
         sessionQueue = DispatchQueue.init(label: Bundle.main.object(forInfoDictionaryKey: "MainAppBundleIdentifier") as! String)
         selectedCaptureDevice = availableCaptureDevices.first ?? AVCaptureDevice.default(for: .video)
+        selectedAudioDevice = availableAudioDevices.first ?? AVCaptureDevice.default(for: .audio)
     }
     
     //    start capture session
@@ -210,6 +218,10 @@ class CameraManager: NSObject {
             return
         }
         
+        if let movieFileOutputConnection = movieFileOutput.connection(with: .video) {
+            movieFileOutputConnection.videoRotationAngle = self.newRotationAngle
+        }
+        
         guard let directoryPath = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedModelContainer.appGroupIdentifier) else {
             print("cannot access local file domain")
             return
@@ -257,6 +269,10 @@ class CameraManager: NSObject {
             
             photoSettings.photoQualityPrioritization = .balanced
             
+            if let photoOutputVideoConnection = photoOutput.connection(with: .video) {
+                photoOutputVideoConnection.videoRotationAngle = self.newRotationAngle
+            }
+            
             photoOutput.capturePhoto(with: photoSettings, delegate: self)
         }
     }
@@ -274,7 +290,9 @@ class CameraManager: NSObject {
         
         guard
             let selectedCaptureDevice = selectedCaptureDevice,
-            let deviceInput = try? AVCaptureDeviceInput(device: selectedCaptureDevice)
+            let selectedAudioDevice = selectedAudioDevice,
+            let deviceInput = try? AVCaptureDeviceInput(device: selectedCaptureDevice),
+            let audioInput = try? AVCaptureDeviceInput(device: selectedAudioDevice)
         else {
             print("failed obtain video input")
             return
@@ -290,7 +308,11 @@ class CameraManager: NSObject {
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: Bundle.main.object(forInfoDictionaryKey: "MainAppBundleIdentifier") as! String + ".output"))
         
         guard captureSession.canAddInput(deviceInput) else {
-            print("can't add device input to capture session")
+            print("can't add video device input to capture session")
+            return
+        }
+        guard captureSession.canAddInput(audioInput) else {
+            print("can't add audio device input to capture session")
             return
         }
         guard captureSession.canAddOutput(photoOutput) else {
@@ -303,11 +325,13 @@ class CameraManager: NSObject {
         }
         
         captureSession.addInput(deviceInput)
+        captureSession.addInput(audioInput)
         captureSession.addOutput(photoOutput)
         captureSession.addOutput(videoOutput)
         captureSession.addOutput(movieFileOutput)
         
         self.deviceInput = deviceInput
+        self.audioInput = audioInput
         self.photoOutput = photoOutput
         self.videoOutput = videoOutput
         self.movieFileOutput = movieFileOutput

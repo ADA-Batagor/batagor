@@ -98,7 +98,7 @@ class CameraViewModel: ObservableObject {
             do {
                 let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
                 if let thumbnailURL = storageManager.saveThumbnail(UIImage(cgImage: cgImage)) {
-                    let storage = Storage(createdAt: Date(), expiredAt: 30, mainPath: movieURL, thumbnailPath: thumbnailURL)
+                    let storage = Storage(createdAt: Date(), expiredAt: 5 * 60, mainPath: movieURL, thumbnailPath: thumbnailURL)
                     context.insert(storage)
                     try? context.save()
                 }

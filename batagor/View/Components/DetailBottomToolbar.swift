@@ -10,6 +10,10 @@ import SwiftUI
 struct DetailBottomToolbar: View {
     var selectedStorage: Storage
     
+    @Environment(\.modelContext) private var modelContext
+    
+    @State private var showDeleteConfirmation = false
+    
     var body: some View {
         HStack {
             if let thumbnailImage = StorageManager.shared.loadUIImage(fileURL: selectedStorage.thumbnailPath)
@@ -30,14 +34,25 @@ struct DetailBottomToolbar: View {
                     }
                 }
             }
+            
+            Spacer()
+            
+            Button {
+                showDeleteConfirmation = true
+            } label: {
+                CircleButton(icon: "trash")
+            }
+            .confirmationDialog("Delete Photo", isPresented: $showDeleteConfirmation, titleVisibility: .hidden) {
+                Button("Delete", role: .destructive) {
+                    withAnimation {
+                        DeletionService.shared.manualDelete(modelContext: modelContext, storage: selectedStorage)
+                    }
+                }
+            } message: {
+                let ext = selectedStorage.mainPath.pathExtension == "mp4" ? "video" : "photo"
+                Text("This \(ext) will be deleted permanently.")
+                
+            }
         }
     }
-}
-
-#Preview {
-    DetailBottomToolbar(selectedStorage: Storage(
-            mainPath: URL(string: "https://example.com")!,
-            thumbnailPath: URL(string: "https://example.com")!
-        )
-    )
 }

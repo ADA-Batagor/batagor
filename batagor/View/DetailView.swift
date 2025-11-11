@@ -7,6 +7,8 @@
 
 import SwiftUI
 import SwiftData
+import AVKit
+import UniformTypeIdentifiers
 
 struct DetailView: View {
     @Environment(\.modelContext) private var modelContext
@@ -43,7 +45,18 @@ struct DetailView: View {
                         ForEach(storages, id: \.self) { storage in
                             ZStack {
                                 if storage.mainPath.pathExtension == "mp4" {
-                                    
+                                    let currentPlayer = AVPlayer(url: storage.mainPath as URL)
+                                    VideoPlayer(player: currentPlayer)
+                                        .scaleEffect(scale * dismissScale)
+                                        .offset(CGSize(width: offset.width + dismissOffset.width, height: offset.height + dismissOffset.height))
+                                        .simultaneousGesture(simultaneousGesture())
+                                        .onAppear {
+                                            currentPlayer.play()
+                                        }
+                                        .task {
+                                            let duration = await TimeFormatter.getVideoDuration(from: storage.mainPath)
+                                            print(duration)
+                                        }
                                 } else {
                                     if let uiImage = StorageManager.shared.loadUIImage(fileURL: storage.mainPath) {
                                         Image(uiImage: uiImage)
@@ -51,68 +64,7 @@ struct DetailView: View {
                                             .scaledToFit()
                                             .scaleEffect(scale * dismissScale)
                                             .offset(CGSize(width: offset.width + dismissOffset.width, height: offset.height + dismissOffset.height))
-                                            .simultaneousGesture(
-                                                SimultaneousGesture(
-                                                    MagnificationGesture()
-                                                        .onChanged { value in
-                                                            scale = lastScale * value
-                                                        }
-                                                        .onEnded { value in
-                                                            if scale < 1 {
-                                                                withAnimation {
-                                                                    scale = 1
-                                                                    lastScale = 1
-                                                                    offset = .zero
-                                                                }
-                                                            } else if scale > 3 {
-                                                                withAnimation {
-                                                                    scale = 3
-                                                                    lastScale = 3
-                                                                }
-                                                            }
-                                                            
-                                                            lastScale = scale
-                                                            isZoomed = scale > 1
-                                                        },
-                                                    
-                                                    DragGesture()
-                                                        .onChanged { value in
-                                                            if !isZoomed {
-                                                                if abs(value.translation.height) > abs(value.translation.width) {
-                                                                    dismissOffset.height = value.translation.height
-                                                                    let progress = min(abs(value.translation.height) / 200, 1.0)
-                                                                    dismissScale = 1.0 - (progress * 0.5)
-                                                                }
-                                                            } else {
-                                                                offset = CGSize(
-                                                                    width: lastOffset.width + value.translation.width,
-                                                                    height: lastOffset.height + value.translation.height
-                                                                )
-                                                            }
-                                                        }
-                                                        .onEnded { value in
-                                                            lastOffset = offset
-                                                            
-                                                            if !isZoomed {
-                                                                if abs(value.translation.height) > 150 {
-                                                                    withAnimation(.easeOut(duration: 0.3)) {
-                                                                        dismissOffset = CGSize(width: 0, height: value.translation.height > 0 ? 1000 : -1000)
-                                                                        dismissScale = 0
-                                                                    }
-                                                                    
-                                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                                                        showCover = false
-                                                                    }
-                                                                } else {
-                                                                    withAnimation(.spring()) {
-                                                                        dismissOffset = .zero
-                                                                        dismissScale = 1.0
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                )
-                                            )
+                                            .simultaneousGesture(simultaneousGesture())
                                     }
                                 }
                             }
@@ -183,33 +135,10 @@ struct DetailView: View {
                     }
                     
                     
-                    HStack {
-                        if let selectedStorage = selectedStorage {
-                            DetailBottomToolbar(selectedStorage: selectedStorage)
-                        }
-                        
-                        Spacer()
-                        
-                        Button {
-                            showDeleteConfirmation = true
-                        } label: {
-                            CircleButton(icon: "trash")
-                        }
-                        .confirmationDialog("Delete Photo", isPresented: $showDeleteConfirmation, titleVisibility: .hidden) {
-                            Button("Delete", role: .destructive) {
-                                if let storage = selectedThumbnail {
-                                    withAnimation {
-                                        DeletionService.shared.manualDelete(modelContext: modelContext, storage: storage)
-                                    }
-                                }
-                            }
-                        } message: {
-                            if let storage = selectedStorage,
-                               let ext = storage.mainPath.pathExtension == "mp4" ? "video" : "photo" {
-                                Text("This \(ext) will be deleted permanently.")
-                            }
-                        }
+                    if let selectedThumbnail = selectedThumbnail {
+                        DetailBottomToolbar(selectedStorage: selectedThumbnail)
                     }
+                    
                 }
                 .padding(.vertical, 30)
                 .padding(.top, 20)
@@ -223,6 +152,69 @@ struct DetailView: View {
             }
         }
         .ignoresSafeArea(.all)
+    }
+    
+    private func simultaneousGesture() -> some Gesture {
+        SimultaneousGesture(
+            MagnificationGesture()
+                .onChanged { value in
+                    scale = lastScale * value
+                }
+                .onEnded { value in
+                    if scale < 1 {
+                        withAnimation {
+                            scale = 1
+                            lastScale = 1
+                            offset = .zero
+                        }
+                    } else if scale > 3 {
+                        withAnimation {
+                            scale = 3
+                            lastScale = 3
+                        }
+                    }
+                    
+                    lastScale = scale
+                    isZoomed = scale > 1
+                },
+            
+            DragGesture()
+                .onChanged { value in
+                    if !isZoomed {
+                        if abs(value.translation.height) > abs(value.translation.width) {
+                            dismissOffset.height = value.translation.height
+                            let progress = min(abs(value.translation.height) / 200, 1.0)
+                            dismissScale = 1.0 - (progress * 0.5)
+                        }
+                    } else {
+                        offset = CGSize(
+                            width: lastOffset.width + value.translation.width,
+                            height: lastOffset.height + value.translation.height
+                        )
+                    }
+                }
+                .onEnded { value in
+                    lastOffset = offset
+                    
+                    if !isZoomed {
+                        if abs(value.translation.height) > 150 {
+                            withAnimation(.easeOut(duration: 0.3)) {
+                                dismissOffset = CGSize(width: 0, height: value.translation.height > 0 ? 1000 : -1000)
+                                dismissScale = 0
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                showCover = false
+                            }
+                        } else {
+                            withAnimation(.spring()) {
+                                dismissOffset = .zero
+                                dismissScale = 1.0
+                            }
+                        }
+                    }
+                }
+        )
     }
 }
 
