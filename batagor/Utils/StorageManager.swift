@@ -30,7 +30,9 @@ class StorageManager {
     
     func savePhoto(_ image: UIImage) -> URL? {
         let filename = "\(UUID().uuidString)"
-        let fileURL = photosDirectory.appendingPathComponent(filename)
+        let fileURL = photosDirectory
+            .appendingPathComponent(filename)
+            .appendingPathExtension("heic")
         guard let data = image.heicData() else {
             return nil
         }

@@ -65,17 +65,7 @@ struct GalleryView: View {
                     Spacer()
                     if isSelectionMode {
                         HStack {
-                            Button {
-                                // Share
-                            } label : {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.spaceGroteskBold(size: 17))
-                                    .foregroundStyle(.black)
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 14)
-                            .background(Color.batagorPrimary)
-                            .cornerRadius(20)
+                            BulkShare
                             
                             Spacer()
                             
@@ -104,6 +94,7 @@ struct GalleryView: View {
                             .padding(.vertical, 14)
                             .background(Color.batagorPrimary)
                             .cornerRadius(20)
+                            .disabled(selectedMediaIds.isEmpty ? true : false)
                         }
                         .padding(.horizontal)
                     } else {
@@ -154,23 +145,23 @@ struct GalleryView: View {
             .navigationBarTitleDisplayMode(shouldShowScrolledState ? .inline : .large)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            if !shouldShowScrolledState {
-                                Text("Library")
-                                    .font(.spaceGroteskBold(size: 34))
-                                    .transition(.opacity.combined(with: .move(edge: .top)))
-                            }
-                            GalleryCount(currentCount: photos.count)
+                    VStack(alignment: .leading, spacing: 0) {
+                        if !shouldShowScrolledState {
+                            Text("Library")
+                                .font(.spaceGroteskBold(size: 34))
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                         }
-                        .padding(.top, shouldShowScrolledState ? 0 : 90)
+                        GalleryCount(currentCount: photos.count)
+                    }
+                    .padding(.top, shouldShowScrolledState ? 0 : 90)
+                    .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    SelectButton
+                        .padding(.top, shouldShowScrolledState ? 0 : 50)
                         .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
-                    }
-                    
-                    ToolbarItem(placement: .topBarTrailing) {
-                        SelectButton
-                            .padding(.top, shouldShowScrolledState ? 0 : 50)
-                            .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
-                    }
+                }
             }
             .overlay(alignment: .top) {
                 if shouldShowScrolledState {
@@ -328,7 +319,7 @@ struct GalleryView: View {
                                     }
                                     
                                     if isSelectionMode { return }
-
+                                    
                                     isDragging.remove(photo.id)
                                     hapticTrigger = false
                                     
@@ -342,7 +333,7 @@ struct GalleryView: View {
                                             if let previousId = swipedPhotoId, previousId != photo.id {
                                                 swipeOffsets[previousId] = 0
                                             }
-
+                                            
                                             shouldAnimateSwipe.insert(photo.id)
                                             swipeOffsets[photo.id] = -90
                                             swipedPhotoId = photo.id
@@ -361,7 +352,7 @@ struct GalleryView: View {
                                     
                                 }
                         )
-                        .contentShape(Rectangle())  
+                        .contentShape(Rectangle())
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 17)
@@ -426,6 +417,23 @@ struct GalleryView: View {
                 .background(Color.batagorSecondary)
                 .cornerRadius(10)
         }
+    }
+    
+    private var BulkShare: some View {
+        let mediaToShare = photos
+            .filter { selectedMediaIds.contains($0.id) }
+            .map { $0.mainPath }
+        
+        return ShareLink(items: mediaToShare) {
+            Image(systemName: "square.and.arrow.up")
+                .font(.spaceGroteskBold(size: 17))
+                .foregroundStyle(.black)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .background(Color.batagorPrimary)
+                .cornerRadius(20)
+        }
+        .disabled(selectedMediaIds.isEmpty ? true : false)
     }
     
     private func deleteMedia(_ media: Storage) {
