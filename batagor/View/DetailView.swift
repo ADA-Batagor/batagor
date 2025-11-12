@@ -29,6 +29,9 @@ struct DetailView: View {
     @State private var dismissScale: CGFloat = 1.0
     @State private var isZoomed = false
     
+    //    video player
+    @State private var player: AVPlayer?
+    
     @Query(sort: \Storage.createdAt, order: .reverse)
     private var allStorages: [Storage]
     private var storages: [Storage] {
@@ -45,13 +48,14 @@ struct DetailView: View {
                         ForEach(storages, id: \.self) { storage in
                             ZStack {
                                 if storage.mainPath.pathExtension == "mp4" {
-                                    let currentPlayer = AVPlayer(url: storage.mainPath as URL)
-                                    VideoPlayer(player: currentPlayer)
+                                    //                                          PlainAVPlayer(player: player)
+                                    VideoPlayer(player: player)
                                         .scaleEffect(scale * dismissScale)
                                         .offset(CGSize(width: offset.width + dismissOffset.width, height: offset.height + dismissOffset.height))
                                         .simultaneousGesture(simultaneousGesture())
-                                        .onAppear {
-                                            currentPlayer.play()
+                                        .task {
+                                            player = AVPlayer(url: storage.mainPath as URL)
+                                            player?.play()
                                         }
                                 } else {
                                     if let uiImage = StorageManager.shared.loadUIImage(fileURL: storage.mainPath) {

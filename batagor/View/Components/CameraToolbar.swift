@@ -33,7 +33,7 @@ struct CameraToolbar: View {
         HStack {
             Button {
                 selectedStorage = latestStorage
-                showCover.toggle()
+                showCover = true
             } label: {
                 if let storage = latestStorage, let uiImage = UIImage(contentsOfFile: storage.thumbnailPath.path()) {
                     Image(uiImage: uiImage)

@@ -107,6 +107,9 @@ struct Camera: View {
         .task {
             await cameraViewModel.camera.start()
         }
+        .onDisappear {
+            cameraViewModel.camera.stop()
+        }
         .onChange(of: cameraViewModel.photoTaken?.imageData) {
             cameraViewModel.handleSavePhoto(context: modelContext)
         }

@@ -16,23 +16,8 @@ struct DetailBottomToolbar: View {
     
     var body: some View {
         HStack {
-            if let thumbnailImage = StorageManager.shared.loadUIImage(fileURL: selectedStorage.thumbnailPath)
-            {
-                if selectedStorage.mainPath.pathExtension == "mp4" {
-                    ShareLink(item: selectedStorage.mainPath, preview: SharePreview("Share Your Temp Video", image: Image(uiImage: thumbnailImage))
-                    ) {
-                        CircleButton(icon: "square.and.arrow.up")
-                    }
-                } else {
-                    if let mainImage = StorageManager.shared.loadUIImage(fileURL: selectedStorage.mainPath) {
-                        ShareLink(
-                            item: Image(uiImage: mainImage),
-                            preview: SharePreview("Share Your Temp Photo", image: Image(uiImage: thumbnailImage))
-                        ) {
-                            CircleButton(icon: "square.and.arrow.up")
-                        }
-                    }
-                }
+            ShareLink(item: selectedStorage.mainPath) {
+                CircleButton(icon: "square.and.arrow.up")
             }
             
             Spacer()
