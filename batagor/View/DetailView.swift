@@ -48,15 +48,19 @@ struct DetailView: View {
                         ForEach(storages, id: \.self) { storage in
                             ZStack {
                                 if storage.mainPath.pathExtension == "mp4" {
-                                    //                                          PlainAVPlayer(player: player)
-                                    VideoPlayer(player: player)
-                                        .scaleEffect(scale * dismissScale)
-                                        .offset(CGSize(width: offset.width + dismissOffset.width, height: offset.height + dismissOffset.height))
-                                        .simultaneousGesture(simultaneousGesture())
-                                        .task {
-                                            player = AVPlayer(url: storage.mainPath as URL)
-                                            player?.play()
-                                        }
+                                    if selectedThumbnail == storage {
+                                        VideoPlayer(player: player)
+                                            .scaleEffect(scale * dismissScale)
+                                            .offset(CGSize(width: offset.width + dismissOffset.width, height: offset.height + dismissOffset.height))
+                                            .simultaneousGesture(simultaneousGesture())
+                                            .task {
+                                                player = AVPlayer(url: storage.mainPath as URL)
+                                                player?.play()
+                                            }
+                                            .onDisappear {
+                                                player?.pause()
+                                            }
+                                    }
                                 } else {
                                     if let uiImage = StorageManager.shared.loadUIImage(fileURL: storage.mainPath) {
                                         Image(uiImage: uiImage)
