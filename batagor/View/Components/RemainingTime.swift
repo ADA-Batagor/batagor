@@ -35,7 +35,7 @@ struct RemainingTime: View {
             }
         } else {
             HStack(spacing: 4) {
-                Text((TimeFormatter.formatHourRemaining(timeRemaining)))
+                Text((TimeFormatter.formatTimeRemaining(timeRemaining)))
                     .font(.spaceGroteskRegular(size: 24))
                     .foregroundStyle(.black)
                     .monospacedDigit()

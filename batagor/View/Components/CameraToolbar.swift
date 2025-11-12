@@ -161,11 +161,13 @@ struct CameraToolbar: View {
             withAnimation {
                 rotation = newValue
             }
+        }
         .fullScreenCover(isPresented: $showCover) {
             DetailView(selectedStorage: $selectedStorage, showCover: $showCover)
         }
     }
 }
+    
 
 //#Preview {
 //    CameraToolbar()
