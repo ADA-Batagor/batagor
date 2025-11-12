@@ -9,9 +9,11 @@ import SwiftUI
 import SwiftData
 
 struct GalleryView: View {
-    let TOP_SCROLL_THRESHOLD: CGFloat = 145
-    let BOTTOM_SCROLL_THRESHOLD: CGFloat = 135
+    let TOP_SCROLL_THRESHOLD: CGFloat = 155
+    let BOTTOM_SCROLL_THRESHOLD: CGFloat = 145
     let MEDIA_LIMIT = 24
+    let TITLE_TOP_OFFSET: CGFloat = 150
+    let SUBTITLE_TOP_OFFSET: CGFloat = 100
     
     @EnvironmentObject var timer: SharedTimerManager
     @EnvironmentObject var navigationManager: NavigationManager
@@ -118,8 +120,17 @@ struct GalleryView: View {
                                 if photos.count < 24 {
                                     navigationManager.navigate(to: .camera)
                                 } else {
-                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                                        showLimitToast = true
+                                    if showLimitToast {
+                                        showLimitToast = false
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                                showLimitToast = true
+                                            }
+                                        }
+                                    } else {
+                                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                            showLimitToast = true
+                                        }
                                     }
                                 }
                                 
@@ -148,13 +159,12 @@ struct GalleryView: View {
                         LinearGradient(
                             stops: [
                                 Gradient.Stop(color: Color.lightBase, location: 0.0),
-                                Gradient.Stop(color: Color.lightBase.opacity(0.8), location: 0.3),
-                                Gradient.Stop(color: .clear, location: 1.0)
+                                Gradient.Stop(color: .clear, location: 0.5)
                             ],
                             startPoint: .bottom,
                             endPoint: .top
                         )
-                        .frame(height: 100)
+                        .frame(height: 96)
                     }
                     .ignoresSafeArea()
                 }
@@ -181,13 +191,14 @@ struct GalleryView: View {
                             }
                             GalleryCount(currentCount: photos.count)
                         }
-                        .padding(.top, shouldShowScrolledState ? 0 : 90)
+                        .padding(.top, shouldShowScrolledState ? 0 : TITLE_TOP_OFFSET)
+                        .padding(.bottom, shouldShowScrolledState ? 0: 20)
                         .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
                     }
                     
                     ToolbarItem(placement: .topBarTrailing) {
                         SelectButton
-                            .padding(.top, shouldShowScrolledState ? 0 : 50)
+                            .padding(.top, shouldShowScrolledState ? 0 : SUBTITLE_TOP_OFFSET)
                             .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
                     }
             }

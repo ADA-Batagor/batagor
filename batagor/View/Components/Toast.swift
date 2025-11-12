@@ -31,6 +31,15 @@ struct Toast: View {
         .background(Color.darkerBlue90.opacity(0.9))
         .cornerRadius(20)
         .padding(.horizontal)
+        .onTapGesture {
+            dismissToast()
+        }
+    }
+    
+    private func dismissToast() {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+            isShowing = false
+        }
     }
 }
 
@@ -41,27 +50,44 @@ struct ToastModifier: ViewModifier {
     let duration: TimeInterval
     
     @State private var workItem: DispatchWorkItem?
+    @State private var animationId: UUID = UUID()
     
     func body(content: Content) -> some View {
         ZStack(alignment: .bottom) {
             content
             
-            if isShowing {
-                Toast(message: message, icon: icon, isShowing: $isShowing)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .offset(y: -80)
-                    .onAppear {
-                        workItem?.cancel()
-                        let task = DispatchWorkItem {
-                            withAnimation(.easeOut(duration: 0.3)) {
-                                isShowing = false
+            VStack {
+                Spacer()
+                
+                if isShowing {
+                    Toast(message: message, icon: icon, isShowing: $isShowing)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .id(animationId)
+                        .onAppear {
+                            scheduleAutoDismiss()
+                        }
+                        .onChange(of: isShowing) { oldValue, newValue in
+                            if newValue && oldValue {
+                                animationId = UUID()
+                                scheduleAutoDismiss()
                             }
                         }
-                        workItem = task
-                        DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: task)
-                    }
+                }
+            }
+            .padding(.bottom, 80)
+        }
+        
+    }
+    
+    private func scheduleAutoDismiss() {
+        workItem?.cancel()
+        let task = DispatchWorkItem {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                isShowing = false
             }
         }
+        workItem = task
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: task)
     }
 }
 
