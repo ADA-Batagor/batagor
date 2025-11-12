@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 class TimeFormatter {
     static func formatTimeRemaining(_ interval: TimeInterval) -> String {
@@ -18,14 +19,15 @@ class TimeFormatter {
         }
     }
     
-    static func formatHourRemaining(_ interval: TimeInterval) -> String {
-        let hours = Int(interval) / 3600
-        
-        if hours > 0 {
-            return String(format: "%d hours left", hours)
-        } else {
-            return String(format: "less than hour left")
+    static func getVideoDuration(from url: URL) async -> Double {
+        let asset = AVURLAsset(url: url)
+
+        do {
+            let duration = try await CMTimeGetSeconds(asset.load(.duration))
+            return duration
+        } catch {
+            print("Failed to get duration: ", error)
+            return 0
         }
-        
     }
 }
