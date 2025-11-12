@@ -30,4 +30,11 @@ class TimeFormatter {
             return 0
         }
     }
+    
+    static func formatVideoDuration(_ seconds: Double) -> String {
+        let totalSeconds = Int(ceil(seconds))
+        let minutes = totalSeconds / 60
+        let remainingSeconds = totalSeconds % 60
+        return String(format: "%02d:%02d", minutes, remainingSeconds)
+    }
 }

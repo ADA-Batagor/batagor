@@ -24,9 +24,9 @@
 		</dict>
 	</array>
 	<key>GroupAppBundleIdentifier</key>
-	<string>group.com.tudemaha.lawar</string>
+	<string>group.com.tudemaha.batagor</string>
 	<key>MainAppBundleIdentifier</key>
-	<string>com.tudemaha.lawar</string>
+	<string>com.tudemaha.batagor</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>SpaceGrotesk-Bold.ttf</string>
@@ -48,9 +48,5 @@
 	</array>
 	<key>UIBackgroundModes</key>
 	<array/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location to tag your photos and videos</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>We need your location to tag your photos and videos</string>
 </dict>
 </plist>

@@ -26,6 +26,10 @@ class Storage {
         return Date() > expiredAt
     }
     
+    var isVideo: Bool {
+        return mainPath.pathExtension.lowercased() == "mp4"
+    }
+    
     var timeRemaining: TimeInterval {
         max(0, expiredAt.timeIntervalSince(Date()))
     }

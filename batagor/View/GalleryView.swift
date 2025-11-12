@@ -12,8 +12,8 @@ struct GalleryView: View {
     let TOP_SCROLL_THRESHOLD: CGFloat = 155
     let BOTTOM_SCROLL_THRESHOLD: CGFloat = 145
     let MEDIA_LIMIT = 24
-    let TITLE_TOP_OFFSET: CGFloat = 150
-    let SUBTITLE_TOP_OFFSET: CGFloat = 100
+    let TITLE_TOP_OFFSET: CGFloat = 70
+    let SUBTITLE_TOP_OFFSET: CGFloat = 25
     
     @EnvironmentObject var timer: SharedTimerManager
     @EnvironmentObject var navigationManager: NavigationManager
@@ -71,24 +71,14 @@ struct GalleryView: View {
                     Spacer()
                     if isSelectionMode {
                         HStack {
-                            Button {
-                                BulkShare
-                            } label : {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.spaceGroteskBold(size: 17))
-                                    .foregroundStyle(.black)
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 14)
-                            .background(Color.blueBase)
-                            .cornerRadius(20)
+                            BulkShare
                             
                             Spacer()
                             
                             HStack {
                                 Text("\(selectedMediaIds.count) Media Selected")
                                     .font(.spaceGroteskSemiBold(size: 17))
-                                    .foregroundStyle(.black)
+                                    .foregroundStyle(Color.darkBase)
                             }
                             .padding(.horizontal, 20)
                             .padding(.vertical, 14)
@@ -104,7 +94,7 @@ struct GalleryView: View {
                             } label : {
                                 Image(systemName: "trash")
                                     .font(.spaceGroteskBold(size: 17))
-                                    .foregroundStyle(.black)
+                                    .foregroundStyle(Color.darkBase)
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 14)
@@ -182,25 +172,28 @@ struct GalleryView: View {
             .navigationBarTitleDisplayMode(shouldShowScrolledState ? .inline : .large)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            if !shouldShowScrolledState {
-                                Text("Library")
-                                    .font(.spaceGroteskBold(size: 34))
-                                    .foregroundStyle(Color.darkerBlueBase)
-                                    .transition(.opacity.combined(with: .move(edge: .top)))
-                            }
-                            GalleryCount(currentCount: photos.count)
+                    VStack(alignment: .leading, spacing: 0) {
+                        if !shouldShowScrolledState {
+                            Text("Library")
+                                .font(.spaceGroteskBold(size: 34))
+                                .foregroundStyle(Color.darkerBlueBase)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                         }
-                        .padding(.top, shouldShowScrolledState ? 0 : TITLE_TOP_OFFSET)
-                        .padding(.bottom, shouldShowScrolledState ? 0: 20)
-                        .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
+                        
+                        GalleryCount(currentCount: photos.count)
                     }
-                    
-                    ToolbarItem(placement: .topBarTrailing) {
+                    .padding(.top, shouldShowScrolledState ? 0 : 70)
+                    .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    VStack {
                         SelectButton
-                            .padding(.top, shouldShowScrolledState ? 0 : SUBTITLE_TOP_OFFSET)
-                            .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
                     }
+                    .padding(.top, shouldShowScrolledState ? 0 : 25)
+                    .contentShape(Rectangle())
+                    .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
+                }
             }
             .overlay(alignment: .top) {
                 if shouldShowScrolledState {
@@ -314,7 +307,6 @@ struct GalleryView: View {
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.lightBase)
                 }
-                
                 
                 ForEach(photos) { photo in
                     ZStack(alignment: .trailing) {
@@ -496,10 +488,10 @@ struct GalleryView: View {
         return ShareLink(items: mediaToShare) {
             Image(systemName: "square.and.arrow.up")
                 .font(.spaceGroteskBold(size: 17))
-                .foregroundStyle(.black)
+                .foregroundStyle(Color.darkBase)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
-                .background(Color.batagorPrimary)
+                .background(Color.blueBase)
                 .cornerRadius(20)
         }
         .disabled(selectedMediaIds.isEmpty ? true : false)

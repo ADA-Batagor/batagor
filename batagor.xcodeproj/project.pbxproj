@@ -287,7 +287,7 @@
 				CODE_SIGN_ENTITLEMENTS = widgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HRYT2ZQSJ5;
+				DEVELOPMENT_TEAM = 3QGY9BFW95;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = widget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = widget;
@@ -298,7 +298,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.lawar.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -315,7 +315,7 @@
 				CODE_SIGN_ENTITLEMENTS = widgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HRYT2ZQSJ5;
+				DEVELOPMENT_TEAM = 3QGY9BFW95;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = widget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = widget;
@@ -326,7 +326,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.lawar.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -464,12 +464,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"batagor/Preview Content\"";
-				DEVELOPMENT_TEAM = HRYT2ZQSJ5;
+				DEVELOPMENT_TEAM = 3QGY9BFW95;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = batagor/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to camera to take photos and videos then store it on your temporary vault.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We need your location to tag your photos and videos";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to tag your photos and videos";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs access to microphone to take videos then store it on your temporary vault.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs access to Photos to save your temporary media into Photos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -485,7 +487,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.lawar;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -503,12 +505,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"batagor/Preview Content\"";
-				DEVELOPMENT_TEAM = HRYT2ZQSJ5;
+				DEVELOPMENT_TEAM = 3QGY9BFW95;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = batagor/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to camera to take photos and videos then store it on your temporary vault.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We need your location to tag your photos and videos";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to tag your photos and videos";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs access to microphone to take videos then store it on your temporary vault.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs access to Photos to save your temporary media into Photos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -524,7 +528,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.lawar;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tudemaha.batagor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
