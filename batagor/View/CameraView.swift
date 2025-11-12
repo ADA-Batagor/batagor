@@ -23,6 +23,9 @@ struct Camera: View {
     @State private var currentDuration = 0.0
     @State private var isRecording = false
     @State private var storageCount = 0
+    @State private var currentZoom: CGFloat = 1.0
+    @State private var focusPoint: CGPoint?
+    @State private var showFocusIndicator = false
     
     init() {
         _storages = Query(FetchDescriptor<Storage>())
@@ -54,8 +57,50 @@ struct Camera: View {
                                         }
                                     }
                                     .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    .overlay(alignment: .topLeading) {
+                                        if showFocusIndicator, let point = focusPoint {
+                                            FocusIndicator()
+                                                .offset(x: point.x - 35, y: point.y - 35)
+                                        }
+                                    }
                                     .padding(.horizontal, 22)
                                     .padding(.top, 12)
+                                    .gesture(
+                                        MagnificationGesture()
+                                            .onChanged { value in
+                                                let newZoom = currentZoom * value.magnitude
+                                                cameraViewModel.camera.setZoom(newZoom)
+                                            }
+                                            .onEnded { value in
+                                                currentZoom *= value.magnitude
+                                            }
+                                    )
+                                    .simultaneousGesture(
+                                        DragGesture(minimumDistance: 0)
+                                            .onEnded { value in
+                                                let location = value.location
+                                                let normalizedX = location.x / geometry.size.width
+                                                let normalizedY = location.y / geometry.size.height
+                                                
+                                                let clampedPoint = CGPoint(
+                                                    x: min(max(normalizedX, 0), 1),
+                                                    y: min(max(normalizedY, 0), 1)
+                                                )
+                                                
+                                                focusPoint = location
+                                                withAnimation {
+                                                    showFocusIndicator = true
+                                                }
+                                                
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                                    withAnimation {
+                                                        showFocusIndicator = false
+                                                    }
+                                                }
+                                                cameraViewModel.camera.setFocus(at: clampedPoint)
+                                            }
+                                    )
+                                    
                             }
                             
                             if cameraViewModel.camera.isRunning && !cameraViewModel.camera.isPreviewPaused {
@@ -97,6 +142,7 @@ struct Camera: View {
                             .font(.spaceGroteskSemiBold(size: 17))
                             .foregroundStyle(Color.lightBase)
                     }
+                    .padding(.leading, 8)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     GalleryCount(currentCount: storages.count, foregroundColor: Color.lightBase, countOnly: true)
@@ -134,6 +180,23 @@ struct Camera: View {
             configuration.label
                 .scaleEffect(configuration.isPressed ? 0.85 : 1.0)
                 .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
+        }
+    }
+    
+    struct FocusIndicator: View {
+        @State private var scale: CGFloat = 1.2
+        
+        var body: some View {
+            Rectangle()
+                .stroke(Color.yellow, lineWidth: 2)
+                .frame(width: 70, height: 70)
+                .scaleEffect(scale)
+                .opacity(scale > 1.0 ? 0.0 : 1.0)
+                .onAppear {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                        scale = 1.0
+                    }
+                }
         }
     }
 }
