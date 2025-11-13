@@ -9,6 +9,7 @@ import AVFoundation
 import SwiftUI
 import SwiftData
 import WidgetKit
+import CoreLocation
 
 @MainActor
 class CameraViewModel: ObservableObject {
@@ -18,12 +19,16 @@ class CameraViewModel: ObservableObject {
     let camera = CameraManager()
     let storageManager = StorageManager.shared
     let orientationManager = OrientationManager.shared
+    let locationManager = LocationManager()
+    let geocodeManager = ReverseGeocodeManager()
     
     @Published var previewImage: Image?
     @Published var photoTaken: PhotoData?
     @Published var movieFileURL: URL?
     
     init() {
+        locationManager.requestPermission()
+        
         Task {
             await handleCameraPreview()
         }
@@ -73,13 +78,23 @@ class CameraViewModel: ObservableObject {
     func handleSavePhoto(context: ModelContext) {
         if let image = photoTaken {
             let photo = UIImage(data: image.imageData)!
+            let photoWithLocation = locationManager.addLocationToImage(photo, location: locationManager.currentLocation)
             let mainPath = storageManager.savePhoto(photo)
             let thumbnailPath = storageManager.saveThumbnail(photo)
             
             if let mainPath = mainPath, let thumbnailPath = thumbnailPath {
-                let storage = Storage(createdAt: Date(), expiredAt: TimeInterval(PHOTO_EXPIRY_TIME), mainPath: mainPath, thumbnailPath: thumbnailPath)
+                let storage = Storage(
+                    createdAt: Date(),
+                    expiredAt: TimeInterval(PHOTO_EXPIRY_TIME),
+                    mainPath: mainPath,
+                    thumbnailPath: thumbnailPath,
+                    location: locationManager.currentLocation
+                )
+                
+                storeLocation(storage: storage)
+                
                 context.insert(storage)
-                print("Added \(mainPath)")
+                print("Added \(mainPath) with location: \(locationManager.currentLocation?.coordinate.latitude ?? 0), \(locationManager.currentLocation?.coordinate.longitude ?? 0)")
             }
             
             try? context.save()
@@ -93,6 +108,7 @@ class CameraViewModel: ObservableObject {
     
     func handleSaveMovie(context: ModelContext) {
         if let movieURL = movieFileURL {
+            locationManager.addLocationToVideo(at: movieURL, location: locationManager.currentLocation)
             let asset = AVURLAsset(url: movieURL)
             let imageGenerator = AVAssetImageGenerator(asset: asset)
             imageGenerator.appliesPreferredTrackTransform = true
@@ -101,7 +117,16 @@ class CameraViewModel: ObservableObject {
             do {
                 let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
                 if let thumbnailURL = storageManager.saveThumbnail(UIImage(cgImage: cgImage)) {
-                    let storage = Storage(createdAt: Date(), expiredAt: TimeInterval(VIDEO_EXPIRY_TIME), mainPath: movieURL, thumbnailPath: thumbnailURL)
+                    let storage = Storage(
+                        createdAt: Date(),
+                        expiredAt: TimeInterval(VIDEO_EXPIRY_TIME),
+                        mainPath: movieURL,
+                        thumbnailPath: thumbnailURL,
+                        location: locationManager.currentLocation
+                    )
+                    
+                    storeLocation(storage: storage)
+                    
                     context.insert(storage)
                     try? context.save()
                 }
@@ -129,6 +154,22 @@ class CameraViewModel: ObservableObject {
         let imageSize = (width: Int(photoDimentions.width), height: Int(photoDimentions.height))
         
         return PhotoData(image: image, imageData: imageData, imageSize: imageSize)
+    }
+    
+    private func storeLocation(storage: Storage) {
+        if let location = locationManager.currentLocation {
+            Task {
+                let coordinate = location.coordinate
+                await geocodeManager.reverseGeocode(coordinate: coordinate)
+                
+                if let placemarkInfo = geocodeManager.placemarkInfo {
+                    storage.locationName = placemarkInfo.displayName
+                    storage.locationCity = placemarkInfo.locality
+                }
+                
+                geocodeManager.reset()
+            }
+        }
     }
 }
 

@@ -13,7 +13,7 @@ struct CircularProgress: View {
     var lineWidth: CGFloat = 3
     var size: CGFloat = 20
     var isShowText: Bool = false
-    var foregroundColor: Color = .batagorDark
+    var foregroundColor: Color = Color.darkBase
     
     private var progress: Double {
         guard total > 0 else { return 0 }

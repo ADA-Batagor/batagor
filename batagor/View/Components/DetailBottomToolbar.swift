@@ -34,7 +34,7 @@ struct DetailBottomToolbar: View {
                     }
                 }
             } message: {
-                let ext = selectedStorage.mainPath.pathExtension == "mp4" ? "video" : "photo"
+                let ext = selectedStorage.isVideo ? "video" : "photo"
                 Text("This \(ext) will be deleted permanently.")
                 
             }

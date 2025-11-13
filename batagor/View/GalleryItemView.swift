@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct GalleryItemView: View {
     let storage: Storage
@@ -16,6 +17,9 @@ struct GalleryItemView: View {
     
     @State private var selectedStorage: Storage?
     @State private var showCover: Bool = false
+    @State private var videoDuration: Double?
+    
+    @StateObject private var geocodeManager = ReverseGeocodeManager()
     
     var body: some View {
         ZStack (alignment: .bottomLeading) {
@@ -36,6 +40,41 @@ struct GalleryItemView: View {
                     }
             }
         }
+        .overlay(alignment: .topTrailing) {
+            if storage.isVideo, let duration = videoDuration {
+                ZStack(alignment: .topTrailing) {
+                    LinearGradient(
+                        stops: [
+                            Gradient.Stop(color: .black.opacity(0.7), location: 0.0),
+                            Gradient.Stop(color: .black.opacity(0.4), location: 0.15),
+                            Gradient.Stop(color: .black.opacity(0.15), location: 0.2),
+                            Gradient.Stop(color: .clear, location: 0.3)
+                        ],
+                        startPoint: .topTrailing,
+                        endPoint: .bottomLeading
+                    )
+                    
+                    Text(TimeFormatter.formatVideoDuration(duration))
+                        .font(.spaceGroteskRegular(size: 13))
+                        .foregroundColor(.lightBase)
+                        .padding(.top, 10)
+                        .padding(.trailing, 10)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                .clipShape(
+                    UnevenRoundedRectangle(
+                        cornerRadii: .init(
+                            topLeading: 0,
+                            bottomLeading: 0,
+                            bottomTrailing: 12,
+                            topTrailing: 12
+                        )
+                    )
+                )
+                .allowsHitTesting(false)
+            }
+                
+        }
         .overlay(alignment: .bottom) {
             if !isSelecting {
                 ZStack(alignment: .bottom) {
@@ -51,7 +90,7 @@ struct GalleryItemView: View {
                     .frame(height: 80)
                     
                     ProgressView(value: Double(storage.timeRemaining), total: 86400)
-                        .progressViewStyle(LinearProgressViewStyle(tint: .batagorPrimary))
+                        .progressViewStyle(LinearProgressViewStyle(tint: Color.blueBase))
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                         .frame(height: 6)
                     VStack {
@@ -60,6 +99,18 @@ struct GalleryItemView: View {
                             
                             Spacer()
                             
+                            HStack {
+                                if let locationName = storage.locationName {
+                                    Text(locationName)
+                                        .font(.spaceGroteskRegular(size: 13))
+                                        .foregroundColor(Color.lightBase)
+                                } else {
+                                    Text("No location")
+                                        .font(.spaceGroteskRegular(size: 13))
+                                        .foregroundColor(Color.lightBase)
+                                }
+                            }
+                            .padding(.horizontal, 8)
                         }
                         .padding(.bottom, 12)
                     }
@@ -79,15 +130,15 @@ struct GalleryItemView: View {
              if isSelecting && isSelected {
                 ZStack(alignment: .topLeading) {
                     RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(Color.batagorPrimary, lineWidth: 3)
+                        .strokeBorder(Color.blueBase, lineWidth: 3)
                     
                     Circle()
-                        .fill(Color.batagorPrimary)
+                        .fill(Color.blueBase)
                         .frame(width: 28, height: 28)
                         .overlay(
                             Image(systemName: "checkmark")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.white)
+                                .foregroundColor(Color.darkBase)
                         )
                         .padding(8)
                 }
@@ -96,6 +147,11 @@ struct GalleryItemView: View {
         }
         .fullScreenCover(isPresented: $showCover) {
             DetailView(selectedStorage: $selectedStorage, showCover: $showCover)
+        }
+        .task {
+            if storage.isVideo {
+                videoDuration = await TimeFormatter.getVideoDuration(from: storage.mainPath)
+            }
         }
     }
 }

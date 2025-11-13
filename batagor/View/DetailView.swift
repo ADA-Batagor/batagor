@@ -47,7 +47,7 @@ struct DetailView: View {
                     LazyHStack {
                         ForEach(storages, id: \.self) { storage in
                             ZStack {
-                                if storage.mainPath.pathExtension == "mp4" {
+                                if storage.isVideo {
                                     if selectedThumbnail == storage {
                                         VideoPlayer(player: player)
                                             .scaleEffect(scale * dismissScale)

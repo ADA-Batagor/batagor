@@ -20,10 +20,10 @@ struct RemainingTime: View {
             HStack(spacing: 4) {
                 Image(systemName: "clock")
                     .font(.spaceGroteskRegular(size: 13))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.lightBase)
                 Text(TimeFormatter.formatTimeRemaining(timeRemaining))
                     .font(.spaceGroteskRegular(size: 13))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.lightBase)
                     .monospacedDigit()
             }
             .padding(.horizontal, 10)
@@ -37,11 +37,11 @@ struct RemainingTime: View {
             HStack(spacing: 4) {
                 Text((TimeFormatter.formatTimeRemaining(timeRemaining)))
                     .font(.spaceGroteskRegular(size: 24))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color.darkBase)
                     .monospacedDigit()
             }
             .padding(.horizontal, 10)
-            .background(.batagorPrimary)
+            .background(Color.blueBase)
             .cornerRadius(12)
             .onAppear{
                 updateTimeRemaining()

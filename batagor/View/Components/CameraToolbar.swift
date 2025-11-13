@@ -47,7 +47,7 @@ struct CameraToolbar: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30)
-                        .foregroundStyle(Color(.white))
+                        .foregroundStyle(Color.lightBase)
                         .rotationEffect(.degrees(rotation))
                 }
             }
@@ -62,17 +62,17 @@ struct CameraToolbar: View {
                     Circle()
                         .trim(from: 0, to: (currentDuration / movieDurationLimit))
                         .stroke(style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
-                        .fill(storageCount >= 24 ? .gray : .white)
+                        .fill(storageCount >= 24 ? .gray : Color.lightBase)
                         .rotationEffect(.degrees(-90))
                 } else {
                     Circle()
                         .stroke(lineWidth: lineWidth)
-                        .fill(storageCount >= 24 ? .gray : .white)
+                        .fill(storageCount >= 24 ? .gray : Color.lightBase)
                 }
                 
                 Circle()
                     .inset(by: lineWidth * 1.2)
-                    .fill(storageCount >= 24 ? .gray : isRecording ? .red : .white)
+                    .fill(storageCount >= 24 ? .gray : isRecording ? .red : Color.lightBase)
                     .scaleEffect(isPressed ? 0.85 : 1.0)
                     .frame(height: isRecording ? 120 : 75)
                     .onTapGesture {
@@ -145,7 +145,7 @@ struct CameraToolbar: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 30)
-                    .foregroundStyle(Color(.white))
+                    .foregroundStyle(Color.lightBase)
                     .rotationEffect(.degrees(rotation))
             }
             .padding(15)

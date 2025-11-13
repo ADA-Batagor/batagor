@@ -211,6 +211,42 @@ class CameraManager: NSObject {
         }
     }
     
+    // zoom camera
+    func setZoom(_ factor: CGFloat) {
+        guard let device = selectedCaptureDevice else { return }
+        
+        do {
+            try device.lockForConfiguration()
+            let clampedFactor = min(max(factor, device.minAvailableVideoZoomFactor), device.maxAvailableVideoZoomFactor)
+            device.videoZoomFactor = clampedFactor
+            device.unlockForConfiguration()
+        } catch {
+            print("Error setting zoom: \(error.localizedDescription)")
+        }
+    }
+    
+    func setFocus(at point: CGPoint) {
+        guard let device =  selectedCaptureDevice else { return }
+        
+        do {
+            try device.lockForConfiguration()
+            
+            if device.isFocusPointOfInterestSupported && device.isFocusModeSupported(.autoFocus) {
+                device.focusPointOfInterest = point
+                device.focusMode = .autoFocus
+            }
+            
+            if device.isExposurePointOfInterestSupported && device.isExposureModeSupported(.autoExpose) {
+                device.exposurePointOfInterest = point
+                device.exposureMode = .autoExpose
+            }
+            
+            device.unlockForConfiguration()
+        } catch {
+            print("Error setting focus: \(error.localizedDescription)")
+        }
+    }
+    
     //    start record video
     func startRecordingVideo() {
         guard let movieFileOutput = self.movieFileOutput else {
