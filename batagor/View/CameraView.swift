@@ -26,6 +26,7 @@ struct Camera: View {
     @State private var currentZoom: CGFloat = 1.0
     @State private var focusPoint: CGPoint?
     @State private var showFocusIndicator = false
+    @State private var showStorageLimitAlert = false
     
     init() {
         _storages = Query(FetchDescriptor<Storage>())
@@ -43,7 +44,7 @@ struct Camera: View {
                     endPoint: .top
                 )
                 
-                ZStack(alignment: .bottom) {
+                ZStack(alignment: .center) {
                     GeometryReader { geometry in
                         VStack(spacing: 0) {
                             Spacer()
@@ -120,17 +121,33 @@ struct Camera: View {
                             }
                         }
                         .safeAreaPadding(.top)
+                        
+
                     }
+                    if showStorageLimitAlert {
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                            }
+                        
+                        CustomAlert(
+                            title: "Limit Exceeded",
+                            message: "Delete media to continue capturing",
+                            buttonTitle: "Accept",
+                            onSubmit: {
+                                showStorageLimitAlert = false
+                                navigationManager.navigate(to: .gallery)
+                            }
+                        )
+                    }
+                    
+                    
                 }
                 .onAppear {
                     cameraViewModel.camera.isPreviewPaused = false
                 }
                 .onDisappear {
                     cameraViewModel.camera.isPreviewPaused = true
-                }
-                
-                if storages.count >= 24 {
-                    ErrorModal()
                 }
             }
             .toolbar {
@@ -171,6 +188,11 @@ struct Camera: View {
             
             Task { @MainActor in
                 await DeletionService.shared.performCleanup(modelContext: modelContext)
+            }
+        }
+        .onChange(of: storages.count) { oldValue, newValue in
+            if newValue >= 24 && !showStorageLimitAlert {
+                showStorageLimitAlert = true
             }
         }
     }
