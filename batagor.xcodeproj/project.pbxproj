@@ -66,6 +66,7 @@
 				"Font/SpaceGrotesk-SemiBold.ttf",
 				Model/PlacemarkInfo.swift,
 				Model/Storage.swift,
+				Utils/NavigationManager.swift,
 				Utils/SharedModelContainer.swift,
 				Utils/StorageManager.swift,
 				Utils/TimeFormatter.swift,
@@ -80,12 +81,21 @@
 			);
 			target = 9E61FA082EA75DD200053854 /* batagor */;
 		};
+		3FC1B13F2EB8B03400C49E6C /* Exceptions for "widget" folder in "batagor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppIntent.swift,
+				widgetControl.swift,
+			);
+			target = 9E61FA082EA75DD200053854 /* batagor */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3F764C752EB09ED70028EDD1 /* widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				3FC1B13F2EB8B03400C49E6C /* Exceptions for "widget" folder in "batagor" target */,
 				3F764C872EB09ED80028EDD1 /* Exceptions for "widget" folder in "widgetExtension" target */,
 			);
 			path = widget;
