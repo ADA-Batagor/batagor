@@ -101,7 +101,6 @@ struct Camera: View {
                                                 cameraViewModel.camera.setFocus(at: clampedPoint)
                                             }
                                     )
-                                    
                             }
                             
                             if cameraViewModel.camera.isRunning && !cameraViewModel.camera.isPreviewPaused {
@@ -174,10 +173,14 @@ struct Camera: View {
             cameraViewModel.camera.stop()
         }
         .onChange(of: cameraViewModel.photoTaken?.imageData) {
-            cameraViewModel.handleSavePhoto(context: modelContext)
+            Task {
+                await cameraViewModel.handleSavePhoto(context: modelContext)
+            }
         }
         .onChange(of: cameraViewModel.movieFileURL) {
-            cameraViewModel.handleSaveMovie(context: modelContext)
+            Task {
+                await cameraViewModel.handleSaveMovie(context: modelContext)
+            }
         }
         .onChange(of: timer.currentTime) {
             if isRecording {

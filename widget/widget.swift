@@ -11,11 +11,11 @@ import SwiftData
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> GalleryEntry {
-        GalleryEntry(date: Date(), media: [])
+        GalleryEntry(date: Date(), media: [], count: 0)
     }
     
     func getSnapshot(in context: Context, completion: @escaping (GalleryEntry) -> Void) {
-        let entry = GalleryEntry(date: Date(), media: [])
+        let entry = GalleryEntry(date: Date(), media: [], count: 0)
         completion(entry)
     }
     
@@ -23,8 +23,8 @@ struct Provider: TimelineProvider {
         Task {
             let currentDate = Date()
             let media = await fetchRecentMedia(limit: 4)
-            print(media)
-            let entry = GalleryEntry(date: currentDate, media: media)
+            let count = await fetchCountMedia()
+            let entry = GalleryEntry(date: currentDate, media: media, count: count)
             print(entry)
             
             let nextUpdate: Date
@@ -41,7 +41,6 @@ struct Provider: TimelineProvider {
     }
     
     @MainActor private func fetchRecentMedia(limit: Int) -> [Storage] {
-        print("fetchRecentMedia: running fetch media func")
         let modelContext = SharedModelContainer.shared.mainContext
         
         let descriptor = FetchDescriptor<Storage>(
@@ -63,6 +62,20 @@ struct Provider: TimelineProvider {
             return storage
         }
     }
+    
+    @MainActor private func fetchCountMedia() -> Int {
+        let modelContext = SharedModelContainer.shared.mainContext
+        
+        let descriptor = FetchDescriptor<Storage>(
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        guard let allStorages = try? modelContext.fetch(descriptor) else {
+            print("fetchCountMedia: failed to fetch all storages")
+            return 0
+        }
+        let validMedia = allStorages.filter{!$0.isExpired}
+        return validMedia.count
+    }
 
 }
 
@@ -78,6 +91,7 @@ struct Provider: TimelineProvider {
 struct GalleryEntry: TimelineEntry {
     let date: Date
     let media: [Storage]
+    let count: Int
 }
 
 struct widgetEntryView : View {
@@ -85,15 +99,17 @@ struct widgetEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
-        switch family {
-        case .systemSmall:
-            SmallWidgetView(media: entry.media)
-        case .systemMedium:
-            MediumWidgetView(media: entry.media)
-        case .systemLarge:
-            LargeWidgetView(media: entry.media)
-        default:
-            SmallWidgetView(media: entry.media)
+        ZStack {
+            switch family {
+            case .systemSmall:
+                SmallWidgetView(media: entry.media)
+            case .systemMedium:
+                MediumWidgetView(media: entry.media, count: entry.count)
+    //        case .systemLarge:
+    //            LargeWidgetView(media: entry.media)
+            default:
+                SmallWidgetView(media: entry.media)
+            }
         }
     }
 }
@@ -103,62 +119,244 @@ struct SmallWidgetView: View {
     let media: [Storage]
 
     var body: some View {
-        if let media = media.first {
-            let mediaImage = loadThumbnailForWidget(fileURL: media.thumbnailPath)
-            if let mediaImage = mediaImage {
-                GeometryReader { geometry in
-                    Image(uiImage: mediaImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
-                        .cornerRadius(8)
+        ZStack(alignment: .center) {
+            LinearGradient(
+                stops: [
+                    Gradient.Stop(color: Color.init(hex: "E1EAFD"), location: 0.0),
+                    Gradient.Stop(color: Color.init(hex: "FAF4E6"), location: 1.0)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea(.all)
+            
+            if let media = media.first {
+                let mediaImage = loadThumbnailForWidget(fileURL: media.thumbnailPath)
+                if let mediaImage = mediaImage {
+                    VStack {
+                        HStack(spacing: 4) {
+                            Image(systemName: "clock")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(Color.darkBase)
+                            
+                            Text(TimeFormatter.formatTimeRemaining(media.timeRemaining))
+                                .font(.spaceGroteskSemiBold(size: 17))
+                                .foregroundColor(Color.darkBase)
+                            
+                            Spacer()
+                            
+                            ProgressView(value: Double(media.timeRemaining), total: 86400)
+                                .progressViewStyle(LinearProgressViewStyle(tint: Color.darkerBlue90))
+                                .background(Color.darkerBlue90.opacity(0.4))
+                                .cornerRadius(20)
+                                .scaleEffect(x: 1, y: 2, anchor: .center)
+                                .frame(height: 6)
+                                
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.top, 14)
+                        
+                        Link(destination: createMediaDeepLink(for: media)) {
+                            ZStack(alignment: .bottom) {
+                                GeometryReader { geometry in
+                                    Image(uiImage: mediaImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: geometry.size.width, height: geometry.size.height)
+                                        .clipped()
+                                        .cornerRadius(20)
+                                }
+                                
+                                VStack {
+                                    if let location = media.locationName {
+                                        Text(location)
+                                            .font(.spaceGroteskRegular(size: 10))
+                                            .foregroundStyle(Color.lightBase)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .fill(Color.darkerBlue70.opacity(0.8))
+                                            )
+                                    } else {
+                                        Text("Location Unknown")
+                                            .font(.spaceGroteskRegular(size: 10))
+                                            .foregroundColor(Color.lightBase)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .fill(Color.darkerBlue70.opacity(0.8))
+                                            )
+                                    }
+                                }
+                                .padding(.bottom, 8)
+                                
+                            }
+                            .padding(8)
+                        }
+                    }
                 }
-                .widgetURL(URL(string: "batagor://gallery"))
+            } else {
+                EmptyWidgetView()
             }
-        } else {
-            EmptyWidgetView()
         }
+        .widgetURL(URL(string: "batagor://gallery"))
     }
 }
 
 // MARK: - Medium Widget (2 photos)
 struct MediumWidgetView: View {
     let media: [Storage]
+    let count: Int
 
     var body: some View {
-        if media.isEmpty {
-            EmptyWidgetView()
-        } else {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Recent media")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal, 12)
-                    .padding(.top, 8)
+        GeometryReader { geometry in
+            ZStack(alignment: .center) {
+                LinearGradient(
+                    stops: [
+                        Gradient.Stop(color: Color.init(hex: "E1EAFD"), location: 0.0),
+                        Gradient.Stop(color: Color.init(hex: "FAF4E6"), location: 1.0)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea(.all)
                 
-                HStack(spacing: 8) {
-                    ForEach(media.prefix(3)) { mediaItem in
-                        let mediaImage = loadThumbnailForWidget(fileURL: mediaItem.thumbnailPath)
-                        if let mediaImage = mediaImage {
-                            GeometryReader { geometry in
-                                Image(uiImage: mediaImage)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: geometry.size.width, height: geometry.size.width)
-                                    .clipped()
-                                    .cornerRadius(8)
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("From Today")
+                            .font(.spaceGroteskSemiBold(size: 17))
+                        
+                        Spacer()
+                        
+                        CircularProgress(
+                            current: count,
+                            total: 24,
+                            isShowCount: true,
+                            foregroundColor: Color.darkBase,
+                            font: .spaceGroteskSemiBold(size: 17)
+                        )
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    
+                    if !media.isEmpty {
+                        HStack(spacing: 8) {
+                            Link(destination: URL(string: "batagor://camera")!) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.blue70)
+                                    
+                                    VStack(spacing: 8) {
+                                        ZStack {
+                                            VStack {
+                                                HStack {
+                                                    Image("TopLeft")
+                                                        .resizable()
+                                                        .renderingMode(.template)
+                                                        .foregroundColor(Color.lightBase)
+                                                        .frame(width: 10, height: 10)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Image("TopRight")
+                                                        .resizable()
+                                                        .renderingMode(.template)
+                                                        .foregroundColor(Color.lightBase)
+                                                        .frame(width: 10, height: 10)
+                                                }
+                                                
+                                                Spacer()
+                                                
+                                                HStack {
+                                                    Image("BottomLeft")
+                                                        .resizable()
+                                                        .renderingMode(.template)
+                                                        .foregroundColor(Color.lightBase)
+                                                        .frame(width: 10, height: 10)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Image("BottomRight")
+                                                        .resizable()
+                                                        .renderingMode(.template)
+                                                        .foregroundColor(Color.lightBase)
+                                                        .frame(width: 10, height: 10)
+                                                }
+                                            }
+                                            .padding(8)
+                                            
+                                            Image(systemName: "camera")
+                                                .font(.system(size: 24))
+                                                .foregroundColor(Color.lightBase)
+                                        }
+                                    }
+                                }
+                                .frame(width: (geometry.size.width - 56) / 4, height: 100)
                             }
-                            .aspectRatio(1, contentMode: .fit)
+                            ForEach(media.prefix(3)) { mediaItem in
+                                Link(destination: createMediaDeepLink(for: mediaItem)) {
+                                    let mediaImage = loadThumbnailForWidget(fileURL: mediaItem.thumbnailPath)
+                                    if let mediaImage = mediaImage {
+                                        ZStack(alignment: .bottomLeading) {
+                                            Image(uiImage: mediaImage)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: (geometry.size.width - 56) / 4, height: 100)
+                                                .clipped()
+                                                .cornerRadius(12)
+                                            
+                                            ZStack(alignment: .bottomLeading) {
+                                                LinearGradient(
+                                                    stops: [
+                                                        Gradient.Stop(color: .black.opacity(0.7), location: 0.0),
+                                                        Gradient.Stop(color: .black.opacity(0.4), location: 0.15),
+                                                        Gradient.Stop(color: .black.opacity(0.15), location: 0.2),
+                                                        Gradient.Stop(color: .clear, location: 0.3)
+                                                    ],
+                                                    startPoint: .bottomLeading,
+                                                    endPoint: .topTrailing
+                                                )
+                                                
+                                                HStack(spacing: 4) {
+                                                    Image(systemName: "clock")
+                                                        .font(.system(size: 11))
+                                                        .foregroundColor(Color.lightBase)
+                                                    
+                                                    Text(TimeFormatter.formatTimeRemaining(mediaItem.timeRemaining))
+                                                        .font(.spaceGroteskSemiBold(size: 11))
+                                                        .foregroundColor(Color.lightBase)
+                                                }
+                                                .padding(.horizontal, 4)
+                                                .padding(.vertical, 4)
+                                            }
+                                            .frame(width: (geometry.size.width - 56) / 4, height: 100)
+                                            .clipShape(
+                                                UnevenRoundedRectangle(
+                                                    cornerRadii: .init(
+                                                        topLeading: 0,
+                                                        bottomLeading: 12,
+                                                        bottomTrailing: 12,
+                                                        topTrailing: 12
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
+                    } else {
+                        EmptyWidgetView()
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.bottom, 12)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .widgetURL(URL(string: "batagor://gallery"))
         }
+        
     }
 }
 
@@ -217,6 +415,7 @@ struct EmptyWidgetView: View {
     }
 }
 
+
 // MARK: - UIImage Widget Extension
 extension UIImage {
     func resizedForWidget(maxDimension: CGFloat) -> UIImage {
@@ -251,25 +450,16 @@ struct widget: Widget {
         }
         .configurationDisplayName("Recents")
         .description("View your most recent captured media")
+        .contentMarginsDisabled()
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
 
-//extension ConfigurationAppIntent {
-//    fileprivate static var smiley: ConfigurationAppIntent {
-//        let intent = ConfigurationAppIntent()
-//        intent.favoriteEmoji = "😀"
-//        return intent
-//    }
-//    
-//    fileprivate static var starEyes: ConfigurationAppIntent {
-//        let intent = ConfigurationAppIntent()
-//        intent.favoriteEmoji = "🤩"
-//        return intent
-//    }
-//}
+private func createMediaDeepLink(for media: Storage) -> URL {
+    return URL(string: "batagor://media/\(media.id.uuidString)")!
+}
 
-// MARK: - Previews
+
 
 // MARK: - Preview Sample Data
 extension GalleryEntry {
@@ -284,28 +474,28 @@ extension GalleryEntry {
     }
     
     static var sampleEntry: GalleryEntry {
-        GalleryEntry(date: .now, media: sampleMedia)
+        GalleryEntry(date: .now, media: sampleMedia, count: 12)
     }
 }
 
-
+// MARK: - Previews
 #Preview(as: .systemSmall) {
     widget()
 } timeline: {
-//    GalleryEntry.sampleEntry
-    GalleryEntry(date: Date(), media: [])
+    GalleryEntry.sampleEntry
+//    GalleryEntry(date: Date(), media: [], count: 0)
 }
 
 #Preview(as: .systemMedium) {
     widget()
 } timeline: {
 //    GalleryEntry.sampleEntry
-    GalleryEntry(date: Date(), media: [])
+    GalleryEntry(date: Date(), media: [], count: 0)
 }
 
 #Preview(as: .systemLarge) {
     widget()
 } timeline: {
 //    GalleryEntry.sampleEntry
-    GalleryEntry(date: Date(), media: [])
+    GalleryEntry(date: Date(), media: [], count: 0)
 }

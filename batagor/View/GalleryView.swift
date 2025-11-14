@@ -45,6 +45,10 @@ struct GalleryView: View {
     // Toast
     @State private var showLimitToast: Bool = false
     
+    //Widget
+    @State private var widgetSelectedStorage: Storage?
+    @State private var showWidgetDetail: Bool = false
+    
     @Query(sort: \Storage.createdAt, order: .reverse)
     private var allPhotos: [Storage]
     
@@ -162,6 +166,21 @@ struct GalleryView: View {
             .onAppear {
                 hapticGenerator.prepare()
             }
+            .onChange(of: navigationManager.shouldShowDetail) { oldValue, newValue in
+                if newValue, let mediaId = navigationManager.selectedMediaId {
+                    if let storage = photos.first(where: { $0.id == mediaId }) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            selectedMediaIds.removeAll()
+                            isSelectionMode = false
+
+                            navigationManager.resetDetailNavigation()
+                            showDetailForStorage(storage)
+                        }
+                    } else {
+                        navigationManager.resetDetailNavigation()
+                    }
+                }
+            }
             .toast(
                 isShowing: $showLimitToast,
                 message: "Please delete media first to continue capturing.",
@@ -249,6 +268,14 @@ struct GalleryView: View {
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("Are you sure you want to delete \(selectedMediaIds.count) selected media? This action cannot be undone.")
+        }
+        .fullScreenCover(isPresented: $showWidgetDetail) {
+            navigationManager.resetDetailNavigation()
+            widgetSelectedStorage = nil
+        } content: {
+            if let storage = widgetSelectedStorage {
+                DetailView(selectedStorage: .constant(storage), showCover: $showWidgetDetail)
+            }
         }
         
     }
@@ -548,6 +575,11 @@ struct GalleryView: View {
                 }
             }
         )
+    }
+    
+    private func showDetailForStorage(_ storage: Storage) {
+        widgetSelectedStorage = storage
+        showWidgetDetail = true
     }
 }
 
