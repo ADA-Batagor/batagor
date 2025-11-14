@@ -163,7 +163,7 @@ struct CameraToolbar: View {
             }
         }
         .fullScreenCover(isPresented: $showCover) {
-            DetailView(selectedStorage: $selectedStorage, showCover: $showCover)
+            DetailView(selectedStorage: $selectedStorage, showCover: $showCover, previousPage: .camera)
         }
     }
 }

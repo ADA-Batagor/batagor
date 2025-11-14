@@ -9,13 +9,21 @@ import Foundation
 import AVFoundation
 
 class TimeFormatter {
-    static func formatTimeRemaining(_ interval: TimeInterval) -> String {
+    static func formatTimeRemaining(_ interval: TimeInterval, _ compact: Bool = true) -> String {
         let hours = Int(interval) / 3600
         
-        if hours > 0 {
-            return String(format: "%dh", hours)
+        if compact {
+            if hours > 0 {
+                return String(format: "%dh", hours)
+            } else {
+                return String(format: "< 1h")
+            }
         } else {
-            return String(format: "< 1h")
+            if hours > 0 {
+                return String(format: "%d hours left", hours)
+            } else {
+                return String(format: "< 1 hour left")
+            }
         }
     }
     
