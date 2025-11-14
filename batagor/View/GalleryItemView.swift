@@ -105,7 +105,7 @@ struct GalleryItemView: View {
                                         .font(.spaceGroteskRegular(size: 13))
                                         .foregroundColor(Color.lightBase)
                                 } else {
-                                    Text("No location")
+                                    Text("Location Unknown")
                                         .font(.spaceGroteskRegular(size: 13))
                                         .foregroundColor(Color.lightBase)
                                 }

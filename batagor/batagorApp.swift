@@ -34,7 +34,7 @@ struct batagorApp: App {
                         await DeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
                         shortcutManager.processShortcutItem(navigationManager: navigationManager)
                     }
-               
+                    sign()
                 }
                 .onChange(of: shortcutManager.shortcutItem, { oldValue, newValue in
                     if newValue != nil {
@@ -66,6 +66,23 @@ struct batagorApp: App {
             navigationManager.navigate(to: .gallery)
         } else if url.host == "camera" {
             navigationManager.navigate(to: .camera)
+        } else if url.host == "media" {
+            let pathComponents = url.pathComponents.filter { $0 != "/" }
+            if let uuidString = pathComponents.first,
+               let uuid = UUID(uuidString: uuidString) {
+                navigationManager.navigateToMediaDetail(mediaId: uuid)
+            }
         }
+    }
+    
+    private func sign() {
+        let batagor = """
+        
+        █▀▀▄ █▀▀█ ▀▀█▀▀ █▀▀█ █▀▀▀ █▀▀█ █▀▀█ 
+        █▀▀▄ █▄▄█   █   █▄▄█ █ ▀█ █  █ █▄▄▀ 
+        ▀▀▀  ▀  ▀   ▀   ▀  ▀ ▀▀▀▀ ▀▀▀▀ ▀ ▀▀ 
+        
+        """
+        print(batagor)
     }
 }

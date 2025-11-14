@@ -75,10 +75,9 @@ class CameraViewModel: ObservableObject {
         }
     }
     
-    func handleSavePhoto(context: ModelContext) {
+    func handleSavePhoto(context: ModelContext) async {
         if let image = photoTaken {
             let photo = UIImage(data: image.imageData)!
-            let photoWithLocation = locationManager.addLocationToImage(photo, location: locationManager.currentLocation)
             let mainPath = storageManager.savePhoto(photo)
             let thumbnailPath = storageManager.saveThumbnail(photo)
             
@@ -91,7 +90,7 @@ class CameraViewModel: ObservableObject {
                     location: locationManager.currentLocation
                 )
                 
-                storeLocation(storage: storage)
+                await storeLocation(storage: storage)
                 
                 context.insert(storage)
                 print("Added \(mainPath) with location: \(locationManager.currentLocation?.coordinate.latitude ?? 0), \(locationManager.currentLocation?.coordinate.longitude ?? 0)")
@@ -106,7 +105,7 @@ class CameraViewModel: ObservableObject {
         photoTaken = nil
     }
     
-    func handleSaveMovie(context: ModelContext) {
+    func handleSaveMovie(context: ModelContext) async {
         if let movieURL = movieFileURL {
             locationManager.addLocationToVideo(at: movieURL, location: locationManager.currentLocation)
             let asset = AVURLAsset(url: movieURL)
@@ -125,7 +124,7 @@ class CameraViewModel: ObservableObject {
                         location: locationManager.currentLocation
                     )
                     
-                    storeLocation(storage: storage)
+                    await storeLocation(storage: storage)
                     
                     context.insert(storage)
                     try? context.save()
@@ -156,19 +155,20 @@ class CameraViewModel: ObservableObject {
         return PhotoData(image: image, imageData: imageData, imageSize: imageSize)
     }
     
-    private func storeLocation(storage: Storage) {
+    private func storeLocation(storage: Storage) async {
         if let location = locationManager.currentLocation {
-            Task {
-                let coordinate = location.coordinate
-                await geocodeManager.reverseGeocode(coordinate: coordinate)
-                
-                if let placemarkInfo = geocodeManager.placemarkInfo {
-                    storage.locationName = placemarkInfo.displayName
-                    storage.locationCity = placemarkInfo.locality
-                }
-                
-                geocodeManager.reset()
+//            Task {
+//                
+//            }
+            let coordinate = location.coordinate
+            await geocodeManager.reverseGeocode(coordinate: coordinate)
+            
+            if let placemarkInfo = geocodeManager.placemarkInfo {
+                storage.locationName = placemarkInfo.displayName
+                storage.locationCity = placemarkInfo.locality
             }
+            
+            geocodeManager.reset()
         }
     }
 }

@@ -57,6 +57,8 @@
 		3F764C8B2EB0A8DF0028EDD1 /* Exceptions for "batagor" folder in "widgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Extensions/Color+Ext.swift",
+				"Extensions/Font+Ext.swift",
 				"Font/SpaceGrotesk-Bold.ttf",
 				"Font/SpaceGrotesk-Light.ttf",
 				"Font/SpaceGrotesk-Medium.ttf",
@@ -66,6 +68,8 @@
 				Model/Storage.swift,
 				Utils/SharedModelContainer.swift,
 				Utils/StorageManager.swift,
+				Utils/TimeFormatter.swift,
+				View/Components/CircularProgress.swift,
 			);
 			target = 3F764C712EB09ED70028EDD1 /* widgetExtension */;
 		};
