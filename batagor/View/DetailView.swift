@@ -12,9 +12,10 @@ import UniformTypeIdentifiers
 
 struct DetailView: View {
     @Environment(\.modelContext) private var modelContext
-    
+        
     @Binding var selectedStorage: Storage?
     @Binding var showCover: Bool
+    var previousPage: AppDestination = .gallery
     
     @State private var showToolbar: Bool = true
     @State private var showDeleteConfirmation: Bool = false
@@ -39,123 +40,146 @@ struct DetailView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .center) {
-            Color(showToolbar ? .white : .black)
-            
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack {
-                        ForEach(storages, id: \.self) { storage in
-                            ZStack {
-                                if storage.isVideo {
-                                    if selectedThumbnail == storage {
-                                        VideoPlayer(player: player)
-                                            .scaleEffect(scale * dismissScale)
-                                            .offset(CGSize(width: offset.width + dismissOffset.width, height: offset.height + dismissOffset.height))
-                                            .simultaneousGesture(simultaneousGesture())
-                                            .task {
-                                                player = AVPlayer(url: storage.mainPath as URL)
-                                                player?.play()
-                                            }
-                                            .onDisappear {
-                                                player?.pause()
-                                            }
-                                    }
-                                } else {
-                                    if let uiImage = StorageManager.shared.loadUIImage(fileURL: storage.mainPath) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .scaleEffect(scale * dismissScale)
-                                            .offset(CGSize(width: offset.width + dismissOffset.width, height: offset.height + dismissOffset.height))
-                                            .simultaneousGesture(simultaneousGesture())
-                                    }
-                                }
-                            }
-                            .id(storage.id)
-                            .frame(width: UIScreen.main.bounds.width)
-                        }
-                    }
-                    .scrollTargetLayout()
-                }
-                .scrollPosition(id: $selectedThumbnail)
-                .scrollTargetBehavior(.viewAligned)
-                .safeAreaPadding(.vertical, 80)
-                .onAppear {
-                    proxy.scrollTo(selectedStorage?.id)
-                    selectedThumbnail = selectedStorage
-                }
-                .onChange(of: selectedStorage) { _, newValue in
-                    proxy.scrollTo(newValue?.id)
-                    selectedThumbnail = selectedStorage
-                }
-            }
-            
-            if showToolbar {
-                VStack {
+        GeometryReader { geo in
+            ZStack(alignment: .center) {
+                LinearGradient(
+                    stops: [
+                        Gradient.Stop(color: Color.rgb(red: 250, green: 244, blue: 230), location: 0.0),
+                        Gradient.Stop(color: Color.rgb(red: 237, green: 243, blue: 254), location: 1.0)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                
+                VStack(alignment: .leading, spacing: 15) {
                     HStack {
                         Button {
                             showCover = false
                         } label: {
-                            CircleButton(icon: "chevron.backward")
+                            Image(systemName: "chevron.left")
+                                .font(.spaceGroteskSemiBold(size: 22))
+                                .foregroundStyle(Color.darkBase)
                         }
                         
                         Spacer()
                         
-                        if let storage = selectedThumbnail {
-                            RemainingTime(storage: storage, variant: .large)
-                        }
-                        
-                        Spacer()
-                    }
-                    
-                    Spacer()
-                    
-                    if !isZoomed {
-                        ScrollViewReader { proxy in
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(alignment: .bottom, spacing: 3) {
-                                    ForEach(storages, id: \.self) { storage in
-                                        if let thumbnail = StorageManager.shared.loadUIImage(fileURL: storage.thumbnailPath) {
-                                            Image(uiImage: thumbnail)
-                                                .resizable()
-                                                .scaledToFit()
-                                                .clipShape(.rect(cornerRadius: 2))
-                                                .containerRelativeFrame(.horizontal) { width, _ in
-                                                    storage.id == selectedThumbnail?.id ? width * 0.065 : width * 0.05
-                                                }
-                                                .padding(.horizontal, storage.id == selectedThumbnail?.id ? 4 : 0)
-                                                .onTapGesture {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        vibrateLight()
-                                                        selectedStorage = storage
-                                                    }
-                                                }
+                        HStack(alignment: .center, spacing: 25) {
+                            if previousPage == .camera {
+                                Button {
+                                    showCover = false
+                                    NavigationManager.shared.navigate(to: .gallery)
+                                } label: {
+                                    Text("All Media")
+                                        .font(.spaceGroteskSemiBold(size: 18))
+                                        .foregroundStyle(Color.darkBase)
+                                }
+                            }
+                            
+                            if let selectedStorage = selectedStorage {
+                                Button {
+                                    showDeleteConfirmation = true
+                                } label: {
+                                    Image(systemName: "trash")
+                                        .font(.spaceGroteskSemiBold(size: 22))
+                                        .foregroundStyle(Color.darkBase)
+                                }
+                                .confirmationDialog("Delete Photo", isPresented: $showDeleteConfirmation, titleVisibility: .hidden) {
+                                    Button("Delete", role: .destructive) {
+                                        withAnimation {
+                                            DeletionService.shared.manualDelete(modelContext: modelContext, storage: selectedStorage)
                                         }
                                     }
+                                } message: {
+                                    let ext = selectedStorage.mainPath.pathExtension == "mp4" ? "video" : "photo"
+                                    Text("This \(ext) will be deleted permanently.")
+                                    
                                 }
                             }
                         }
                     }
                     
-                    
-                    if let selectedThumbnail = selectedThumbnail {
-                        DetailBottomToolbar(selectedStorage: selectedThumbnail)
+                    ScrollViewReader { proxy in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack {
+                                ForEach(storages, id: \.self) { storage in
+                                    ZStack {
+                                        if storage.mainPath.pathExtension == "mp4" {
+                                            if selectedThumbnail == storage {
+                                                VideoPlayer(player: player)
+                                                    .overlay(alignment: .bottom) {
+                                                        TimeRemainingBar(storage: storage, showText: false)
+                                                    }
+                                                    .clipShape(.rect(cornerRadius: 12))
+                                                    .scaleEffect(scale * dismissScale)
+                                                    .offset(CGSize(width: offset.width + dismissOffset.width, height: offset.height + dismissOffset.height))
+                                                    .task {
+                                                        player = AVPlayer(url: storage.mainPath as URL)
+                                                        player?.play()
+                                                    }
+                                                    .onDisappear {
+                                                        player?.pause()
+                                                    }
+                                            }
+                                        } else {
+                                            if let uiImage = StorageManager.shared.loadUIImage(fileURL: storage.mainPath) {
+                                                Image(uiImage: uiImage)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .overlay(alignment: .bottom) {
+                                                        TimeRemainingBar(storage: storage, showText: false)
+                                                    }
+                                                    .clipShape(.rect(cornerRadius: 12))
+                                                    .scaleEffect(scale * dismissScale)
+                                                    .offset(CGSize(width: offset.width + dismissOffset.width, height: offset.height + dismissOffset.height))
+                                                
+                                            }
+                                        }
+                                    }
+                                    .id(storage.id)
+                                    .containerRelativeFrame(.horizontal)
+                                    .simultaneousGesture(simultaneousGesture())
+                                }
+                            }
+                            .scrollTargetLayout()
+                        }
+                        .scrollPosition(id: $selectedThumbnail)
+                        .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
+                        .onAppear {
+                            proxy.scrollTo(selectedStorage?.id)
+                            selectedThumbnail = selectedStorage
+                        }
+                        .onChange(of: selectedStorage) { _, newValue in
+                            if let new = newValue {
+                                proxy.scrollTo(new.id)
+                                selectedThumbnail = new
+                            }
+                        }
+                        .safeAreaPadding(.bottom, 150)
                     }
-                    
                 }
-                .padding(.vertical, 30)
-                .padding(.top, 20)
-                .padding(.horizontal, 25)
+                .containerRelativeFrame(.vertical) { height, _ in
+                    height * 0.98
+                }
+                .padding(.horizontal, 35)
+                
+                Knob()
+                    .offset(y: geo.size.height * 0.9)
+                
+                CircularScrollView(
+                    storages: storages,
+                    selectedStorage: $selectedStorage,
+                    selectedThumbnail: $selectedThumbnail,
+                    geo: geo
+                )
+                
             }
-            
+            .ignoresSafeArea(.container)
         }
-        .onTapGesture {
-            withAnimation(.easeInOut) {
-                showToolbar.toggle()
+        .overlay(alignment: .bottom) {
+            if let selectedThumbnail = selectedThumbnail {
+                RemainingTime(storage: selectedThumbnail, variant: .large)
             }
         }
-        .ignoresSafeArea(.all)
     }
     
     private func simultaneousGesture() -> some Gesture {

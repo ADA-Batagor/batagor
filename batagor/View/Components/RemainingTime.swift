@@ -35,13 +35,12 @@ struct RemainingTime: View {
             }
         } else {
             HStack(spacing: 4) {
-                Text((TimeFormatter.formatTimeRemaining(timeRemaining)))
-                    .font(.spaceGroteskRegular(size: 24))
+                Text((TimeFormatter.formatTimeRemaining(timeRemaining, false)))
+                    .font(.spaceGroteskRegular(size: 22))
                     .foregroundStyle(Color.darkBase)
                     .monospacedDigit()
             }
             .padding(.horizontal, 10)
-            .background(Color.blueBase)
             .cornerRadius(12)
             .onAppear{
                 updateTimeRemaining()
