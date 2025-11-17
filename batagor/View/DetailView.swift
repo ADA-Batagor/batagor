@@ -33,7 +33,7 @@ struct DetailView: View {
     //    video player
     @State private var player: AVPlayer?
     
-    @Query(sort: \Storage.createdAt, order: .reverse)
+    @Query(sort: \Storage.createdAt)
     private var allStorages: [Storage]
     private var storages: [Storage] {
         allStorages.filter { $0.expiredAt > Date() }
@@ -154,7 +154,7 @@ struct DetailView: View {
                                 selectedThumbnail = new
                             }
                         }
-                        .safeAreaPadding(.bottom, 150)
+                        .padding(.bottom, 150)
                     }
                 }
                 .containerRelativeFrame(.vertical) { height, _ in
@@ -166,7 +166,7 @@ struct DetailView: View {
                     .offset(y: geo.size.height * 0.9)
                 
                 CircularScrollView(
-                    storages: storages.reversed(),
+                    storages: storages,
                     selectedStorage: $selectedStorage,
                     selectedThumbnail: $selectedThumbnail,
                     geo: geo
