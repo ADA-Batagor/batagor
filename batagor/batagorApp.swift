@@ -33,6 +33,10 @@ struct batagorApp: App {
                     Task { @MainActor in
                         await DeletionService.shared.performCleanup(modelContext: sharedModelContainer.mainContext)
                         shortcutManager.processShortcutItem(navigationManager: navigationManager)
+                        
+                        if navigationManager.shouldShowDetail {
+                             try? await Task.sleep(nanoseconds: 100_000_000)
+                        }
                     }
                     sign()
                 }
@@ -63,13 +67,16 @@ struct batagorApp: App {
         guard url.scheme == "batagor" else { return }
         
         if url.host == "gallery" {
+            print("Deep link: navigating to gallery")
             navigationManager.navigate(to: .gallery)
         } else if url.host == "camera" {
+            print("Deep link: navigating to camera")
             navigationManager.navigate(to: .camera)
         } else if url.host == "media" {
             let pathComponents = url.pathComponents.filter { $0 != "/" }
             if let uuidString = pathComponents.first,
                let mediaId = UUID(uuidString: uuidString) {
+                print("Deep link: navigating to media detail \(mediaId)")
                 navigationManager.navigateToMediaDetail(mediaId: mediaId)
             }
         }

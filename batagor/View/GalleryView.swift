@@ -164,15 +164,39 @@ struct GalleryView: View {
             }
             .onAppear {
                 hapticGenerator.prepare()
+
+                if navigationManager.shouldShowDetail, let mediaId = navigationManager.selectedMediaId {
+                    print("onAppear: Navigating with pending detail navigation: \(mediaId)")
+                    
+                    if showWidgetDetail {
+                        showWidgetDetail = false
+                        widgetSelectedStorage = nil
+                    }
+                    
+                    if let storage = photos.first(where: { $0.id == mediaId }) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            selectedMediaIds.removeAll()
+                            isSelectionMode = false
+                            showDetailForStorage(storage)
+                        }
+                    } else {
+                        print("onAppear: Media not found in photos array: \(mediaId)")
+                        navigationManager.resetDetailNavigation()
+                    }
+                }
             }
             .onChange(of: navigationManager.shouldShowDetail) { oldValue, newValue in
+                print("onChange(navigationManager.shouldShowDetail): shouldShowDetail changed: \(oldValue) -> \(newValue)")
                 if newValue, let mediaId = navigationManager.selectedMediaId {
                     if let storage = photos.first(where: { $0.id == mediaId }) {
+                        if showWidgetDetail {
+                            showWidgetDetail = false
+                            widgetSelectedStorage = nil
+                        }
+                        
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             selectedMediaIds.removeAll()
                             isSelectionMode = false
-
-                            navigationManager.resetDetailNavigation()
                             showDetailForStorage(storage)
                         }
                     } else {
@@ -236,6 +260,23 @@ struct GalleryView: View {
             
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
+            if newPhase == .active {
+                    if navigationManager.shouldShowDetail, let mediaId = navigationManager.selectedMediaId {
+                        print("onChange(scenePhase): Navigating with pending detail navigation: \(mediaId)")
+                        
+                        if let storage = photos.first(where: { $0.id == mediaId }) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                selectedMediaIds.removeAll()
+                                isSelectionMode = false
+                                showDetailForStorage(storage)
+                            }
+                        } else {
+                            print("onChange(scenePhase): Media not found in photos array: \(mediaId)")
+                            navigationManager.resetDetailNavigation()
+                        }
+                    }
+                }
+            
             if newPhase == .background {
                 Task { @MainActor in
                     await
