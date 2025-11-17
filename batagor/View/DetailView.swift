@@ -145,13 +145,23 @@ struct DetailView: View {
                         .scrollPosition(id: $selectedThumbnail)
                         .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
                         .onAppear {
-                            proxy.scrollTo(selectedStorage?.id)
-                            selectedThumbnail = selectedStorage
+                            if let selectedStorage = selectedStorage {
+                                proxy.scrollTo(selectedStorage.id)
+                                selectedThumbnail = selectedStorage
+                            }
                         }
                         .onChange(of: selectedStorage) { _, newValue in
-                            if let new = newValue {
+                            if let new: Storage = newValue {
+                                
+//                                if new.mainPath.pathExtension == "mp4" {
+//                                    Task {
+//                                        player = AVPlayer(url: new.mainPath as URL)
+//                                        player?.play()
+//                                    }
+//                                }
+                                
+                                vibrateLight()
                                 proxy.scrollTo(new.id)
-                                selectedThumbnail = new
                             }
                         }
                         .padding(.bottom, 150)
@@ -176,8 +186,8 @@ struct DetailView: View {
             .ignoresSafeArea(.container)
         }
         .overlay(alignment: .bottom) {
-            if let selectedThumbnail = selectedThumbnail {
-                RemainingTime(storage: selectedThumbnail, variant: .large)
+            if let selectedStorage = selectedStorage {
+                RemainingTime(storage: selectedStorage, variant: .large)
             }
         }
     }
