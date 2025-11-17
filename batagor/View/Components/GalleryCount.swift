@@ -23,7 +23,7 @@ struct GalleryCount: View {
                 foregroundColor: foregroundColor
             )
             
-            Text(countOnly ? "\(currentCount) / \(totalLimit)" : "\(currentCount) / \(totalLimit) Media")
+            Text(countOnly ? "\(currentCount) / \(totalLimit)" : "\(currentCount) / \(totalLimit) Snaps")
                 .font(.spaceGroteskSemiBold(size: 17))
                 .foregroundStyle(foregroundColor)
             

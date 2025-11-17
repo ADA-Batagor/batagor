@@ -198,7 +198,10 @@ struct SmallWidgetView: View {
                     }
                 }
             } else {
-                EmptyWidgetView()
+                Link(destination: URL(string: "batagor://camera")!) {
+                    EmptyWidgetView()
+                }
+                
             }
         }
         .widgetURL(URL(string: "batagor://gallery"))
@@ -227,6 +230,7 @@ struct MediumWidgetView: View {
                     HStack {
                         Text("From Today")
                             .font(.spaceGroteskSemiBold(size: 17))
+                            .foregroundStyle(Color.darkBase)
                         
                         Spacer()
                         
@@ -350,7 +354,87 @@ struct MediumWidgetView: View {
                         .padding(.horizontal, 16)
                         .padding(.bottom, 8)
                     } else {
-                        EmptyWidgetView()
+                        HStack(spacing: 8) {
+                            Link(destination: URL(string: "batagor://camera")!) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.blue70)
+                                    
+                                    VStack(spacing: 8) {
+                                        ZStack {
+                                            VStack {
+                                                HStack {
+                                                    Image("TopLeft")
+                                                        .resizable()
+                                                        .renderingMode(.template)
+                                                        .foregroundColor(Color.lightBase)
+                                                        .frame(width: 10, height: 10)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Image("TopRight")
+                                                        .resizable()
+                                                        .renderingMode(.template)
+                                                        .foregroundColor(Color.lightBase)
+                                                        .frame(width: 10, height: 10)
+                                                }
+                                                
+                                                Spacer()
+                                                
+                                                HStack {
+                                                    Image("BottomLeft")
+                                                        .resizable()
+                                                        .renderingMode(.template)
+                                                        .foregroundColor(Color.lightBase)
+                                                        .frame(width: 10, height: 10)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Image("BottomRight")
+                                                        .resizable()
+                                                        .renderingMode(.template)
+                                                        .foregroundColor(Color.lightBase)
+                                                        .frame(width: 10, height: 10)
+                                                }
+                                            }
+                                            .padding(8)
+                                            
+                                            Image(systemName: "camera")
+                                                .font(.system(size: 24))
+                                                .foregroundColor(Color.lightBase)
+                                        }
+                                    }
+                                }
+                                .frame(width: (geometry.size.width - 56) / 4, height: 100)
+                            }
+                            ForEach(0..<3) { _ in
+                                ZStack(alignment: .bottomLeading) {
+                                    ZStack(alignment: .bottomLeading) {
+                                        Image(systemName: "photo.on.rectangle.angled")
+                                            .font(.system(size: 20))
+                                            .foregroundStyle(.gray)
+                                    }
+                                    .frame(width: (geometry.size.width - 56) / 4, height: 100)
+                                    .clipShape(
+                                        UnevenRoundedRectangle(
+                                            cornerRadii: .init(
+                                                topLeading: 0,
+                                                bottomLeading: 12,
+                                                bottomTrailing: 12,
+                                                topTrailing: 12
+                                            )
+                                        )
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.darkerBlue70, lineWidth: 1)
+                                    )
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
+                        
                     }
                 }
             }
@@ -404,14 +488,23 @@ struct LargeWidgetView: View {
 // MARK: - Empty State
 struct EmptyWidgetView: View {
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "photo.on.rectangle.angled")
-                .font(.system(size: 40))
-                .foregroundStyle(.gray)
-            Text("No Photos")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+        VStack(spacing: 8) {
+            Image(systemName: "cloud.sun")
+                .font(.system(size: 30))
+                .foregroundStyle(Color.darkBase)
+            
+            VStack(alignment: .center, spacing: 4) {
+                Text("A clear day.")
+                    .font(.spaceGroteskBold(size: 17))
+                    .foregroundStyle(Color.darkBase)
+                
+                Text("Let’s get your first snap. It’ll be here for 24 hours.")
+                    .font(.spaceGroteskRegular(size: 10))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color.darkBase)
+            }
         }
+        .padding()
     }
 }
 
@@ -482,8 +575,8 @@ extension GalleryEntry {
 #Preview(as: .systemSmall) {
     widget()
 } timeline: {
-    GalleryEntry.sampleEntry
-//    GalleryEntry(date: Date(), media: [], count: 0)
+//    GalleryEntry.sampleEntry
+    GalleryEntry(date: Date(), media: [], count: 0)
 }
 
 #Preview(as: .systemMedium) {

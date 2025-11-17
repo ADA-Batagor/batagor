@@ -66,6 +66,12 @@ struct batagorApp: App {
             navigationManager.navigate(to: .gallery)
         } else if url.host == "camera" {
             navigationManager.navigate(to: .camera)
+        } else if url.host == "media" {
+            let pathComponents = url.pathComponents.filter { $0 != "/" }
+            if let uuidString = pathComponents.first,
+               let mediaId = UUID(uuidString: uuidString) {
+                navigationManager.navigateToMediaDetail(mediaId: mediaId)
+            }
         }
     }
 
