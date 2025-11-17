@@ -41,6 +41,7 @@ struct GalleryView: View {
     @State private var isDragging: Set<UUID> = []
     @State private var hapticTrigger = false
     @State private var hapticGenerator = UIImpactFeedbackGenerator(style: .medium)
+    @State private var gestureDirection: [UUID: String] = [:]
     
     // Toast
     @State private var showLimitToast: Bool = false
@@ -289,29 +290,34 @@ struct GalleryView: View {
                 await DeletionService.shared.performCleanup(modelContext: modelContext)
             }
         }
-        .confirmationDialog("Don't need this snap anymore?", isPresented: $isDeletingMedia) {
-            Button("Delete", role: .destructive) {
+        .customConfirmationDialog(
+            "Don't need this snap anymore?",
+            isPresented: $isDeletingMedia,
+            actionTitle: "Delete",
+            actionColor: .redBase,
+            action: {
                 if let media = mediaToDelete {
                     withAnimation {
                         deleteMedia(media)
                     }
                     mediaToDelete = nil
                 }
-            }
-            Button("Cancel", role: .cancel) {
+            },
+            cancel: {
                 mediaToDelete = nil
-            }
-        } message: {
-            Text("This will delete it for good. This action can't be undone.")
-        }
-        .confirmationDialog("Don't need this \(selectedMediaIds.count) snap anymore?", isPresented: $isDeletingSelectedMedia) {
-            Button("Delete \(selectedMediaIds.count) Snaps", role: .destructive) {
+            },
+            message:"This will delete it for good. This action can't be undone."
+        )
+        .customConfirmationDialog(
+            "Don't need this \(selectedMediaIds.count) snaps anymore?",
+            isPresented: $isDeletingSelectedMedia,
+            actionTitle: "Delete \(selectedMediaIds.count) Snaps",
+            actionColor: .redBase,
+            action: {
                 bulkDeleteMedia()
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("This will delete it for good. This action can't be undone.")
-        }
+            },
+            message: "This will delete it for good. This action can't be undone."
+        )
         .fullScreenCover(isPresented: $showWidgetDetail) {
             navigationManager.resetDetailNavigation()
             widgetSelectedStorage = nil
@@ -407,7 +413,7 @@ struct GalleryView: View {
                             isSwiped: swipedBinding(for: photo.id)
                         )
                         .offset(x: swipeOffsets[photo.id] ?? 0)
-                        .animation(shouldAnimateSwipe.contains(photo.id) ? .spring(response: 0.3, dampingFraction: 0.75) : nil, value: swipeOffsets[photo.id])
+                        .animation(shouldAnimateSwipe.contains(photo.id) ? .spring(response: 0.3, dampingFraction: 0.75) : .none, value: swipeOffsets[photo.id])
                         .simultaneousGesture(
                             DragGesture(minimumDistance: 20, coordinateSpace: .local)
                                 .onChanged { gesture in
@@ -418,6 +424,21 @@ struct GalleryView: View {
                                     
                                     let horizontalMovement = gesture.translation.width
                                     let verticalMovement = gesture.translation.height
+                                    
+                                    if gestureDirection[photo.id] == nil {
+                                        let absHorizontal = abs(horizontalMovement)
+                                        let absVertical = abs(verticalMovement)
+                                        
+                                        if absHorizontal > 10 || absVertical > 10 {
+                                            if absHorizontal > absVertical * 2.0 {
+                                                gestureDirection[photo.id] = "horizontal"
+                                            } else {
+                                                gestureDirection[photo.id] = "vertical"
+                                            }
+                                        }
+                                    }
+                                    
+                                    guard gestureDirection[photo.id] == "horizontal" else { return }
                                     
                                     if swipedPhotoId == photo.id && horizontalMovement < 0 {
                                         return
@@ -455,9 +476,8 @@ struct GalleryView: View {
                                     hapticTrigger = false
                                     
                                     let horizontalMovement = gesture.translation.width
-                                    let verticalMovement = gesture.translation.height
                                     
-                                    if abs(horizontalMovement) > abs(verticalMovement) * 1.5 {
+                                    if gestureDirection[photo.id] == "horizontal" {
                                         let threshold: CGFloat = -50
                                         
                                         if horizontalMovement < threshold {
@@ -468,6 +488,7 @@ struct GalleryView: View {
                                             shouldAnimateSwipe.insert(photo.id)
                                             swipeOffsets[photo.id] = -90
                                             swipedPhotoId = photo.id
+
                                         } else {
                                             shouldAnimateSwipe.insert(photo.id)
                                             swipeOffsets[photo.id] = 0
@@ -480,7 +501,8 @@ struct GalleryView: View {
                                         swipeOffsets[photo.id] = 0
                                     }
                                     
-                                    
+                                    gestureDirection.removeValue(forKey: photo.id)
+
                                 }
                         )
                         .contentShape(Rectangle())
