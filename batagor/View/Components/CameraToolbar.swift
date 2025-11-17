@@ -52,7 +52,7 @@ struct CameraToolbar: View {
                 }
             }
             .padding(15)
-            .background(latestStorage == nil ? .black.opacity(0.5) : .clear)
+            .background(latestStorage == nil ? Color.lightBase.opacity(0.2) : .clear)
             .clipShape(Circle())
             
             Spacer()
@@ -149,7 +149,7 @@ struct CameraToolbar: View {
                     .rotationEffect(.degrees(rotation))
             }
             .padding(15)
-            .background(.black.opacity(0.5))
+            .background(Color.lightBase.opacity(0.2))
             .clipShape(Circle())
         }
         .onAppear {
