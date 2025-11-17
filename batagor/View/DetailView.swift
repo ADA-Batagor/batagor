@@ -83,17 +83,17 @@ struct DetailView: View {
                                         .font(.spaceGroteskSemiBold(size: 22))
                                         .foregroundStyle(Color.darkBase)
                                 }
-                                .confirmationDialog("Delete Photo", isPresented: $showDeleteConfirmation, titleVisibility: .hidden) {
-                                    Button("Delete", role: .destructive) {
-                                        withAnimation {
-                                            DeletionService.shared.manualDelete(modelContext: modelContext, storage: selectedStorage)
-                                        }
-                                    }
-                                } message: {
-                                    let ext = selectedStorage.mainPath.pathExtension == "mp4" ? "video" : "photo"
-                                    Text("This \(ext) will be deleted permanently.")
-                                    
-                                }
+                                .customConfirmationDialog(
+                                    "Don't need this snap anymore?",
+                                    isPresented: $showDeleteConfirmation,
+                                    actionTitle: "Delete",
+                                    actionColor: .redBase,
+                                    action: {
+                                        DeletionService.shared.manualDelete(modelContext: modelContext, storage: selectedStorage)
+                                    },
+                                    cancel: {},
+                                    message:"This will delete it for good. This action can't be undone."
+                                )
                             }
                         }
                     }
