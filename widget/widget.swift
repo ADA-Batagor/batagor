@@ -204,7 +204,6 @@ struct SmallWidgetView: View {
                 
             }
         }
-        .widgetURL(URL(string: "batagor://gallery"))
     }
 }
 
@@ -438,7 +437,6 @@ struct MediumWidgetView: View {
                     }
                 }
             }
-            .widgetURL(URL(string: "batagor://gallery"))
         }
         
     }

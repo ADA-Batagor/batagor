@@ -154,6 +154,7 @@ struct Camera: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
+                        navigationManager.resetDetailNavigation()
                         navigationManager.navigate(to: .gallery)
                     } label: {
                         Image(systemName: "chevron.left")

@@ -25,11 +25,15 @@ class NavigationManager: ObservableObject {
     
     func navigate(to destination: AppDestination) {
         print("Navigating to \(destination)")
+        if destination != selectedTab {
+            resetDetailNavigation()
+        }
         selectedTab = destination
     }
     
     func navigateToMediaDetail(mediaId: UUID) {
         print("Navigating to media detail: \(mediaId)")
+        
         selectedTab = .gallery
         selectedMediaId = mediaId
         shouldShowDetail = true
