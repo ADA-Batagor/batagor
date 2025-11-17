@@ -10,6 +10,8 @@ import AVFoundation
 import SwiftData
 
 struct Camera: View {
+    let MEDIA_LIMIT = 24
+    
     @Environment(\.modelContext) private var modelContext
     
     @EnvironmentObject var timer: SharedTimerManager
@@ -130,8 +132,8 @@ struct Camera: View {
                             }
                         
                         CustomAlert(
-                            title: "Limit Exceeded",
-                            message: "Delete media to continue capturing",
+                            title: "All spots are full",
+                            message: "Delete an existing one or wait for a spot to open up.",
                             buttonTitle: "Accept",
                             onSubmit: {
                                 showStorageLimitAlert = false
@@ -168,6 +170,11 @@ struct Camera: View {
         }
         .task {
             await cameraViewModel.camera.start()
+        }
+        .onAppear {
+            if storages.count >= MEDIA_LIMIT {
+                showStorageLimitAlert = true
+            }
         }
         .onDisappear {
             cameraViewModel.camera.stop()

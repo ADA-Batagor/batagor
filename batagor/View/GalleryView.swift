@@ -80,7 +80,7 @@ struct GalleryView: View {
                             Spacer()
                             
                             HStack {
-                                Text("\(selectedMediaIds.count) Media Selected")
+                                Text("\(selectedMediaIds.count) Snaps Selected")
                                     .font(.spaceGroteskSemiBold(size: 17))
                                     .foregroundStyle(Color.darkBase)
                             }
@@ -127,13 +127,12 @@ struct GalleryView: View {
                                         }
                                     }
                                 }
-                                
                             } label: {
                                 HStack {
                                     Image(systemName: "camera")
                                         .font(.spaceGroteskSemiBold(size: 17))
                                         .foregroundStyle(photos.count < MEDIA_LIMIT ? Color.darkBase : Color.light50)
-                                    Text("Add media")
+                                    Text("Capture Snaps")
                                         .font(.spaceGroteskSemiBold(size: 17))
                                         .foregroundStyle(photos.count < MEDIA_LIMIT ? Color.darkBase : Color.light50)
                                 }
@@ -183,7 +182,7 @@ struct GalleryView: View {
             }
             .toast(
                 isShowing: $showLimitToast,
-                message: "Please delete media first to continue capturing.",
+                message: "Delete or wait for one to clear automatically to add new snap.",
                 icon: "exclamationmark.triangle",
                 duration: 3.0
             )
@@ -193,7 +192,7 @@ struct GalleryView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     VStack(alignment: .leading, spacing: 0) {
                         if !shouldShowScrolledState {
-                            Text("Library")
+                            Text("Today")
                                 .font(.spaceGroteskBold(size: 34))
                                 .foregroundStyle(Color.darkerBlueBase)
                                 .transition(.opacity.combined(with: .move(edge: .top)))
@@ -205,14 +204,17 @@ struct GalleryView: View {
                     .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
                 }
                 
-                ToolbarItem(placement: .topBarTrailing) {
-                    VStack {
-                        SelectButton
+                if !photos.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        VStack {
+                            SelectButton
+                        }
+                        .padding(.top, shouldShowScrolledState ? 0 : 25)
+                        .contentShape(Rectangle())
+                        .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
                     }
-                    .padding(.top, shouldShowScrolledState ? 0 : 25)
-                    .contentShape(Rectangle())
-                    .animation(.easeInOut(duration: 0.2), value: shouldShowScrolledState)
                 }
+                
             }
             .overlay(alignment: .top) {
                 if shouldShowScrolledState {
@@ -246,7 +248,7 @@ struct GalleryView: View {
                 await DeletionService.shared.performCleanup(modelContext: modelContext)
             }
         }
-        .confirmationDialog("Delete Media", isPresented: $isDeletingMedia) {
+        .confirmationDialog("Don't need this snap anymore?", isPresented: $isDeletingMedia) {
             Button("Delete", role: .destructive) {
                 if let media = mediaToDelete {
                     withAnimation {
@@ -259,15 +261,15 @@ struct GalleryView: View {
                 mediaToDelete = nil
             }
         } message: {
-            Text("Are you sure you want to delete this media? This action cannot be undone.")
+            Text("This will delete it for good. This action can't be undone.")
         }
-        .confirmationDialog("Delete Selected Media", isPresented: $isDeletingSelectedMedia) {
-            Button("Delete \(selectedMediaIds.count) Media", role: .destructive) {
+        .confirmationDialog("Don't need this \(selectedMediaIds.count) snap anymore?", isPresented: $isDeletingSelectedMedia) {
+            Button("Delete \(selectedMediaIds.count) Snaps", role: .destructive) {
                 bulkDeleteMedia()
             }
             Button("Cancel", role: .cancel) { }
         } message: {
-            Text("Are you sure you want to delete \(selectedMediaIds.count) selected media? This action cannot be undone.")
+            Text("This will delete it for good. This action can't be undone.")
         }
         .fullScreenCover(isPresented: $showWidgetDetail) {
             navigationManager.resetDetailNavigation()
@@ -309,15 +311,15 @@ struct GalleryView: View {
                 if photos.count >= MEDIA_LIMIT {
                     HStack {
                         HStack(spacing: 10) {
-                            Image(systemName: "exclamationmark.triangle")
+                            Image(systemName: "sun.max")
                                 .resizable()
                                 .fontWeight(.semibold)
                                 .frame(width: 24, height: 24)
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Limit Exceeded!")
+                                Text("Your day is full!")
                                     .font(.spaceGroteskBold(size: 17))
                                     .foregroundStyle(Color.darkBase)
-                                Text("You have used all storage. Delete media to continue.")
+                                Text("To add new snap, wait for one disappear or delete an existing one to make room.")
                                     .font(.spaceGroteskRegular(size: 17))
                                     .foregroundStyle(Color.darkBase)
                             }
@@ -463,25 +465,24 @@ struct GalleryView: View {
     
     private var EmptyStateView: some View {
         VStack(spacing: 0) {
-            Spacer()
-            
             VStack(spacing: 20) {
-                Image(systemName: "photo.on.rectangle.angled")
-                    .font(.system(size: 80))
-                    .foregroundStyle(.gray)
+                Image(systemName: "cloud.sun")
+                    .font(.system(size: 40))
+                    .foregroundStyle(Color.darkBase)
                 
-                VStack(spacing: 4) {
-                    Text("No media")
-                        .font(.title3)
-                        .fontWeight(.semibold)
+                VStack(alignment: .center, spacing: 4) {
+                    Text("A clear day.")
+                        .font(.spaceGroteskBold(size: 24))
+                        .foregroundStyle(Color.darkBase)
                     
-                    Text("Captured media will appear here")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
+                    Text("Let’s get your first snap. It’ll be here for 24 hours.")
+                        .font(.spaceGroteskRegular(size: 17))
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(Color.darkBase)
                 }
+                .padding()
             }
             .padding()
-            Spacer()
         }
         .padding(.horizontal)
         
@@ -501,9 +502,13 @@ struct GalleryView: View {
             Text(isSelectionMode ? "Cancel": "Select")
                 .padding(.horizontal, 15)
                 .padding(.vertical, 7)
-                .foregroundStyle(Color.darkBase)
-                .background(Color.yellow30)
+                .foregroundStyle(isSelectionMode ? Color.lightBase : Color.darkBase)
+                .background(isSelectionMode ? Color.yellow60 : Color.yellow30)
                 .cornerRadius(40)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 40)
+                        .stroke(Color.yellow60, lineWidth: 1)
+                )
         }
     }
     
@@ -586,4 +591,5 @@ struct GalleryView: View {
 #Preview {
     GalleryView()
         .environmentObject(SharedTimerManager.shared)
+        .environmentObject(NavigationManager.shared)
 }

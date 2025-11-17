@@ -15,10 +15,10 @@ struct widgetControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(kind: Self.kind) {
             ControlWidgetButton(action: OpenCameraIntent()) {
-                Label("Capture", systemImage: "camera.viewfinder")
+                Label("Capture Snaps", systemImage: "camera.viewfinder")
             }
         }
-        .displayName("Capture")
+        .displayName("Capture Snaps")
         .description("Quickly open camera to capture media")
     }
 }

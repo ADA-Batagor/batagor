@@ -36,7 +36,7 @@ struct CircularProgress: View {
         .frame(width: size, height: size)
         
         if isShowText {
-            Text("\(current) / \(total) Media")
+            Text("\(current) / \(total) Snaps")
                 .font(font)
                 .foregroundStyle(foregroundColor)
         } else if isShowCount {
