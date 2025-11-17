@@ -166,7 +166,7 @@ struct DetailView: View {
                     .offset(y: geo.size.height * 0.9)
                 
                 CircularScrollView(
-                    storages: storages,
+                    storages: storages.reversed(),
                     selectedStorage: $selectedStorage,
                     selectedThumbnail: $selectedThumbnail,
                     geo: geo
