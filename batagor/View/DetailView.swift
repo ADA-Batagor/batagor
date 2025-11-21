@@ -12,7 +12,7 @@ import UniformTypeIdentifiers
 
 struct DetailView: View {
     @Environment(\.modelContext) private var modelContext
-        
+    
     @Binding var selectedStorage: Storage?
     @Binding var showCover: Bool
     var previousPage: AppDestination = .gallery
@@ -33,7 +33,7 @@ struct DetailView: View {
     //    video player
     @State private var player: AVPlayer?
     
-    @Query(sort: \Storage.createdAt, order: .reverse)
+    @Query(sort: \Storage.createdAt)
     private var allStorages: [Storage]
     private var storages: [Storage] {
         allStorages.filter { $0.expiredAt > Date() }
@@ -145,16 +145,17 @@ struct DetailView: View {
                         .scrollPosition(id: $selectedThumbnail)
                         .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
                         .onAppear {
-                            proxy.scrollTo(selectedStorage?.id)
-                            selectedThumbnail = selectedStorage
-                        }
-                        .onChange(of: selectedStorage) { _, newValue in
-                            if let new = newValue {
-                                proxy.scrollTo(new.id)
-                                selectedThumbnail = new
+                            if let selectedStorage = selectedStorage {
+                                proxy.scrollTo(selectedStorage.id)
                             }
                         }
-                        .safeAreaPadding(.bottom, 150)
+                        .onChange(of: selectedStorage) { _, newValue in
+                            if let new: Storage = newValue {
+                                HapticManager.shared.impact(.light)
+                                proxy.scrollTo(new.id)
+                            }
+                        }
+                        .padding(.bottom, 150)
                     }
                 }
                 .containerRelativeFrame(.vertical) { height, _ in
@@ -176,8 +177,8 @@ struct DetailView: View {
             .ignoresSafeArea(.container)
         }
         .overlay(alignment: .bottom) {
-            if let selectedThumbnail = selectedThumbnail {
-                RemainingTime(storage: selectedThumbnail, variant: .large)
+            if let selectedStorage = selectedStorage {
+                RemainingTime(storage: selectedStorage, variant: .large)
             }
         }
     }

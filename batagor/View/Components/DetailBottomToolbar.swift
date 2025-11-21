@@ -35,7 +35,7 @@ struct DetailBottomToolbar: View {
                 }
             } message: {
                 let ext = selectedStorage.isVideo ? "video" : "photo"
-                Text("This \(ext) will be deleted permanently.")
+                Text("This \(ext) will delete it for good. This action can't be undone.")
                 
             }
         }

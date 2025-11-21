@@ -20,7 +20,7 @@ struct Knob: View {
                 let angle = startAngle + progress * (endAngle - startAngle)
                 
                 Rectangle()
-                    .fill(Color.primary)
+                    .fill(Color.darkBase)
                     .frame(width: 2, height: tickLength)
                     .offset(y: -(1.8 / 2) * UIScreen.main.bounds.width)
                     .rotationEffect(.degrees(angle))
