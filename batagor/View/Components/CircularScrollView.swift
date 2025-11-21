@@ -30,6 +30,7 @@ struct CircularScrollView: View {
                                     Image(uiImage: thumbnail)
                                         .resizable()
                                         .scaledToFill()
+                                        .clipped()
                                         .preference(key: CenterThumbnailPreferenceKey.self, value: [storage.id: centerX])
                                 }
                                 .id(storage.id)
@@ -77,6 +78,7 @@ struct CircularScrollView: View {
                     }
                 }
                 .onChange(of: selectedThumbnail) { _, newValue in
+                    borderedThumbnail = selectedStorage
                     if let new = newValue {
                         withAnimation {
                             proxy.scrollTo(new.id)
@@ -92,9 +94,6 @@ struct CircularScrollView: View {
                         if let choosen = storages.first(where: { $0.id == best.key }), hasScrolledToInitial {
                             selectedStorage = choosen
                             borderedThumbnail = choosen
-//                            if choosen.mainPath.pathExtension == "mp4" {
-//                                selectedThumbnail = choosen
-//                            }
                         }
                     }
                 }

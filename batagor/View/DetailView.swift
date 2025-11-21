@@ -151,7 +151,7 @@ struct DetailView: View {
                         }
                         .onChange(of: selectedStorage) { _, newValue in
                             if let new: Storage = newValue {
-                                vibrateLight()
+                                HapticManager.shared.impact(.light)
                                 proxy.scrollTo(new.id)
                             }
                         }

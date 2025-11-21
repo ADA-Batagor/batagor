@@ -32,8 +32,10 @@ struct CameraToolbar: View {
     var body: some View {
         HStack {
             Button {
-                selectedStorage = latestStorage
-                showCover = true
+                if let latestStorage = latestStorage {
+                    selectedStorage = latestStorage
+                    showCover = true
+                }
             } label: {
                 if let storage = latestStorage, let uiImage = UIImage(contentsOfFile: storage.thumbnailPath.path()) {
                     Image(uiImage: uiImage)
@@ -80,7 +82,7 @@ struct CameraToolbar: View {
                             isPressed = true
                         }
                         
-                        vibrateLight()
+                        HapticManager.shared.impact(.light)
                         cameraViewModel.camera.takePhoto()
                         
                         withAnimation(.easeInOut(duration: 0.05)) {
@@ -100,12 +102,12 @@ struct CameraToolbar: View {
                             isRecording = true
                         }
                         
-                        vibrateLight()
+                        HapticManager.shared.impact(.light)
                         cameraViewModel.camera.startRecordingVideo()
                     } onPressingChanged: { _ in
                         cameraViewModel.camera.stopRecordingVideo()
                         if isRecording {
-                            vibrateLight()
+                            HapticManager.shared.impact(.light)
                         }
                         
                         withAnimation(.easeInOut(duration: 0.15)) {
@@ -119,7 +121,7 @@ struct CameraToolbar: View {
                             cameraViewModel.camera.stopRecordingVideo()
                             
                             if isRecording {
-                                vibrateLight()
+                                HapticManager.shared.impact(.light)
                             }
                             
                             withAnimation(.easeInOut(duration: 0.15)) {
