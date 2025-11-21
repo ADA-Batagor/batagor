@@ -15,6 +15,7 @@ struct CircularScrollView: View {
     
     @State private var hasScrolledToInitial = false
     @State private var changeFromTap = false
+    @State private var borderedThumbnail: Storage?
     
     var body: some View {
         ZStack {
@@ -33,6 +34,10 @@ struct CircularScrollView: View {
                                 }
                                 .id(storage.id)
                                 .frame(width: 40, height: 70)
+                                .border(
+                                    Color.blueBase,
+                                    width: borderedThumbnail == storage ? 4 : 0
+                                )
                                 .clipShape(.rect(cornerRadius: 5))
                                 .offset(y: -(1.8 / 2) * UIScreen.main.bounds.width)
                                 .visualEffect { content, geometryProxy in
@@ -64,10 +69,11 @@ struct CircularScrollView: View {
                 .offset(y: geo.size.height * 0.83)
                 .onAppear {
                     if let selectedStorage = selectedStorage, !hasScrolledToInitial {
-                            withAnimation {
-                                proxy.scrollTo(selectedStorage.id)
-                            }
-                            hasScrolledToInitial = true
+                        borderedThumbnail = selectedStorage
+                        withAnimation {
+                            proxy.scrollTo(selectedStorage.id)
+                        }
+                        hasScrolledToInitial = true
                     }
                 }
                 .onChange(of: selectedThumbnail) { _, newValue in
@@ -79,12 +85,16 @@ struct CircularScrollView: View {
                 }
                 .onPreferenceChange(CenterThumbnailPreferenceKey.self) { centers in
                     if changeFromTap { return }
-
+                    
                     if let best = centers.min(by: {
                         abs($0.value - (geo.size.width / 2)) < abs($1.value - (geo.size.width / 2))
                     }) {
                         if let choosen = storages.first(where: { $0.id == best.key }), hasScrolledToInitial {
                             selectedStorage = choosen
+                            borderedThumbnail = choosen
+//                            if choosen.mainPath.pathExtension == "mp4" {
+//                                selectedThumbnail = choosen
+//                            }
                         }
                     }
                 }

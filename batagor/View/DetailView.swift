@@ -12,7 +12,7 @@ import UniformTypeIdentifiers
 
 struct DetailView: View {
     @Environment(\.modelContext) private var modelContext
-        
+    
     @Binding var selectedStorage: Storage?
     @Binding var showCover: Bool
     var previousPage: AppDestination = .gallery
@@ -147,19 +147,10 @@ struct DetailView: View {
                         .onAppear {
                             if let selectedStorage = selectedStorage {
                                 proxy.scrollTo(selectedStorage.id)
-                                selectedThumbnail = selectedStorage
                             }
                         }
                         .onChange(of: selectedStorage) { _, newValue in
                             if let new: Storage = newValue {
-                                
-//                                if new.mainPath.pathExtension == "mp4" {
-//                                    Task {
-//                                        player = AVPlayer(url: new.mainPath as URL)
-//                                        player?.play()
-//                                    }
-//                                }
-                                
                                 vibrateLight()
                                 proxy.scrollTo(new.id)
                             }
