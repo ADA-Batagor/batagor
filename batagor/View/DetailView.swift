@@ -76,6 +76,12 @@ struct DetailView: View {
                             }
                             
                             if let selectedStorage = selectedStorage {
+                                ShareLink(item: selectedStorage.mainPath) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.spaceGroteskSemiBold(size: 22))
+                                        .foregroundStyle(Color.darkBase)
+                                }
+                                
                                 Button {
                                     showDeleteConfirmation = true
                                 } label: {
