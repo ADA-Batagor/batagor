@@ -98,12 +98,12 @@ class ReverseGeocodeManager: ObservableObject {
                 
                 placemarkInfo = info
                 
-                print("Geocoder result:")
-                print("  Name: \(placemark.name ?? "nil")")
-                print("  Thoroughfare: \(placemark.thoroughfare ?? "nil")")
-                print("  SubLocality: \(placemark.subLocality ?? "nil")")
-                print("  Locality: \(placemark.locality ?? "nil")")
-                print("  AreasOfInterest: \(placemark.areasOfInterest?.joined(separator: ", ") ?? "nil")")
+//                print("Geocoder result:")
+//                print("  Name: \(placemark.name ?? "nil")")
+//                print("  Thoroughfare: \(placemark.thoroughfare ?? "nil")")
+//                print("  SubLocality: \(placemark.subLocality ?? "nil")")
+//                print("  Locality: \(placemark.locality ?? "nil")")
+//                print("  AreasOfInterest: \(placemark.areasOfInterest?.joined(separator: ", ") ?? "nil")")
             }
         } catch {
             print("Reverse geocoding error: \(error.localizedDescription)")
