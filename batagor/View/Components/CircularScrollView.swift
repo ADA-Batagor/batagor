@@ -11,6 +11,7 @@ struct CircularScrollView: View {
     var storages: [Storage]
     @Binding var selectedStorage: Storage?
     @Binding var selectedThumbnail: Storage?
+    @Binding var selectedVideo: Storage?
     var geo: GeometryProxy
     
     @State private var hasScrolledToInitial = false
@@ -94,6 +95,10 @@ struct CircularScrollView: View {
                         if let choosen = storages.first(where: { $0.id == best.key }), hasScrolledToInitial {
                             selectedStorage = choosen
                             borderedThumbnail = choosen
+                            
+                            if choosen.mainPath.pathExtension == "mp4" {
+                                selectedVideo = choosen
+                            }
                         }
                     }
                 }

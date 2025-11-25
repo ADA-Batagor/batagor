@@ -20,6 +20,7 @@ struct DetailView: View {
     @State private var showToolbar: Bool = true
     @State private var showDeleteConfirmation: Bool = false
     @State private var selectedThumbnail: Storage?
+    @State private var selectedVideo: Storage?
     
     //    gesture state
     @State private var offset: CGSize = .zero
@@ -192,6 +193,7 @@ struct DetailView: View {
                         .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
                         .onAppear {
                             if let selectedStorage = selectedStorage {
+                                selectedThumbnail = selectedStorage
                                 proxy.scrollTo(selectedStorage.id)
                             }
                         }
@@ -201,6 +203,12 @@ struct DetailView: View {
                                 proxy.scrollTo(new.id)
                             }
                         }
+                        .onChange(of: selectedVideo, { _, newValue in
+                            if let new: Storage = newValue {
+                                selectedThumbnail = selectedVideo
+                            }
+                        })
+                        
                         .padding(.bottom, isShowedDetail ? 25 : 150)
                     }
                 }
@@ -217,6 +225,7 @@ struct DetailView: View {
                         storages: storages,
                         selectedStorage: $selectedStorage,
                         selectedThumbnail: $selectedThumbnail,
+                        selectedVideo: $selectedVideo,
                         geo: geo
                     )
                 }
