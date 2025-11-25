@@ -32,7 +32,7 @@ class PhotoSeeder {
             if let fileURL = StorageManager.shared.savePhoto(dummyPhoto) {
                 let file = Storage(createdAt: Date(), expiredAt: expirationTimes[index], mainPath: fileURL, thumbnailPath: fileURL)
                 modelContext.insert(file)
-                print("Added \(labels[index]) - expires in \(expirationTimes[index])s")
+//                print("Added \(labels[index]) - expires in \(expirationTimes[index])s")
             }
         }
         
