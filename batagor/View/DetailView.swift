@@ -269,63 +269,62 @@ struct DetailView: View {
             
             DragGesture()
                 .onChanged { value in
-                    if !isShowedDetail {
-                        if !isZoomed {
-                            if abs(value.translation.height) > abs(value.translation.width) {
-                                blockHorizontal = true
-                                if value.translation.height > abs(value.translation.width) {
-                                    dismissOffset.height = value.translation.height
-                                    let progress = min(abs(value.translation.height) / 200, 1.0)
-                                    dismissScale = 1.0 - (progress * 0.5)
-                                }
-                            }
-                        } else {
-                            blockHorizontal = true
-                            offset = CGSize(
-                                width: lastOffset.width + value.translation.width,
-                                height: lastOffset.height + value.translation.height
-                            )
-                        }
-                    }
-                    else {
+                    //                    if !isShowedDetail {
+                    if !isZoomed {
                         if abs(value.translation.height) > abs(value.translation.width) {
                             blockHorizontal = true
+                            if value.translation.height > abs(value.translation.width) {
+                                dismissOffset.height = value.translation.height
+                                let progress = min(abs(value.translation.height) / 200, 1.0)
+                                dismissScale = 1.0 - (progress * 0.5)
+                            }
                         }
+                    } else {
+                        blockHorizontal = true
+                        offset = CGSize(
+                            width: lastOffset.width + value.translation.width,
+                            height: lastOffset.height + value.translation.height
+                        )
                     }
+                    //                    } else {
+                    //                        if abs(value.translation.height) > abs(value.translation.width) {
+                    //                            blockHorizontal = true
+                    //                        }
+                    //                    }
                 }
                 .onEnded { value in
                     lastOffset = offset
                     
-                    if !isShowedDetail {
-                        if !isZoomed {
-                            if value.translation.height > 150 {
-                                withAnimation(.easeOut(duration: 0.3)) {
-                                    dismissOffset = CGSize(width: 0, height: value.translation.height > 0 ? 1000 : -1000)
-                                    dismissScale = 0
-                                }
-                                
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    showCover = false
-                                }
-                            } else if value.translation.height < -50 {
-                                withAnimation(.bouncy) {
-                                    isShowedDetail = true
-                                }
-                            } else {
-                                withAnimation(.spring()) {
-                                    dismissOffset = .zero
-                                    dismissScale = 1.0
-                                }
+                    //                    if !isShowedDetail {
+                    if !isZoomed {
+                        if value.translation.height > 150 {
+                            withAnimation(.easeOut(duration: 0.3)) {
+                                dismissOffset = CGSize(width: 0, height: value.translation.height > 0 ? 1000 : -1000)
+                                dismissScale = 0
                             }
-                        }
-                    } else {
-                        if value.translation.height > value.translation.width &&
-                            value.translation.height > 50 {
-                            withAnimation(.bouncy) {
-                                isShowedDetail = false
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                showCover = false
+                            }
+//                        } else if value.translation.height < -50 {
+//                            withAnimation(.bouncy) {
+//                                isShowedDetail = true
+//                            }
+                        } else {
+                            withAnimation(.spring()) {
+                                dismissOffset = .zero
+                                dismissScale = 1.0
                             }
                         }
                     }
+                    //                    } else {
+                    //                        if value.translation.height > value.translation.width &&
+                    //                            value.translation.height > 50 {
+                    //                            withAnimation(.bouncy) {
+                    //                                isShowedDetail = false
+                    //                            }
+                    //                        }
+                    //                    }
                     
                     blockHorizontal = false
                 }
