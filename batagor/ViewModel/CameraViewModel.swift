@@ -157,9 +157,6 @@ class CameraViewModel: ObservableObject {
     
     private func storeLocation(storage: Storage) async {
         if let location = locationManager.currentLocation {
-//            Task {
-//                
-//            }
             let coordinate = location.coordinate
             await geocodeManager.reverseGeocode(coordinate: coordinate)
             
